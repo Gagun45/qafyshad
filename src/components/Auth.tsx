@@ -28,7 +28,7 @@ export default function Auth() {
           className="cursor-pointer"
         >
           <TooltipTrigger>
-            <LogOutIcon className="size-4" />
+            <LogOutIcon />
             <span>Logout</span>
           </TooltipTrigger>
         </SidebarMenuButton>
@@ -37,12 +37,12 @@ export default function Auth() {
           <SheetTrigger asChild>
             <SidebarMenuButton asChild>
               <TooltipTrigger className="cursor-pointer">
-                <LogInIcon className="size-4" />
+                <LogInIcon />
                 <span>Login</span>
               </TooltipTrigger>
             </SidebarMenuButton>
           </SheetTrigger>
-          <AuthSheet setIsOpen={setIsOpen}/>
+          <AuthSheet setIsOpen={setIsOpen} />
         </Sheet>
       )}
       <TooltipContent side="right">

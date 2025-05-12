@@ -30,6 +30,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import Auth from "./Auth";
+import Profile from "./Profile";
 
 const items = [
   { title: "Home", url: "/", icon: Home },
@@ -111,7 +112,8 @@ export default function AppSidebar() {
 
         <SidebarFooter>
           <SidebarMenu>
-            <SidebarMenuItem>
+            <SidebarMenuItem className="space-y-2">
+              <Profile />
               <Auth />
             </SidebarMenuItem>
           </SidebarMenu>
