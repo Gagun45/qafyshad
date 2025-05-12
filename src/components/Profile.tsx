@@ -3,14 +3,17 @@
 import { useSession } from "next-auth/react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Separator } from "./ui/separator";
-import { SidebarMenuButton } from "./ui/sidebar";
+import { SidebarMenuButton, useSidebar } from "./ui/sidebar";
 import { UserCircleIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export default function Profile() {
+  const { isMobile, state } = useSidebar();
   const { data: session } = useSession();
   return (
-    <Tooltip>
+    <Tooltip
+      open={isMobile ? false : state === "collapsed" ? undefined : false}
+    >
       <Popover>
         <TooltipTrigger asChild>
           <PopoverTrigger asChild>
