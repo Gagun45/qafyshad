@@ -14,8 +14,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signIn } from "next-auth/react";
-import type { Dispatch, SetStateAction } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useTransition, type Dispatch, type SetStateAction } from "react";
+import { login, type LoginFormDataType } from "@/lib/actions";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -24,8 +26,10 @@ const formSchema = z.object({
 
 export function LoginForm({
   setFormType,
+  setIsOpen,
 }: {
   setFormType: Dispatch<SetStateAction<"login" | "register" | "forgot">>;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -35,9 +39,34 @@ export function LoginForm({
     },
     mode: "onChange",
   });
+
+  const [isPending, startTransition] = useTransition();
+
+  const { update } = useSession();
+
+  const onLoginSubmit = async (data: LoginFormDataType) => {
+    startTransition(async () => {
+      try {
+        await login(data);
+        await update();
+        toast("You logged in successfully");
+        setIsOpen(false);
+      } catch (e) {
+        if (e instanceof Error) {
+          if (e.message === "No such user") {
+            form.setError("email", { message: e.message });
+          } else if (e.message === "Wrong password") {
+            form.setError("password", { message: e.message });
+          } else {
+            form.setError("root", { message: e.message });
+          }
+        }
+      }
+    });
+  };
   return (
     <Form {...form}>
-      <form className="space-y-8">
+      <form className="space-y-8" onSubmit={form.handleSubmit(onLoginSubmit)}>
         <FormField
           control={form.control}
           name="email"
@@ -65,8 +94,8 @@ export function LoginForm({
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          Login
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? "Logging in..." : "Login"}
         </Button>
       </form>
       <button

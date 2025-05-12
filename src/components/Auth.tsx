@@ -7,10 +7,12 @@ import { SidebarMenuButton, useSidebar } from "./ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { toast } from "sonner";
 import AuthSheet from "./AuthSheet";
+import { useState } from "react";
 
 export default function Auth() {
   const { data: session } = useSession();
   const { isMobile, state, setOpen } = useSidebar();
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <Tooltip
       open={isMobile ? false : state === "collapsed" ? undefined : false}
@@ -31,7 +33,7 @@ export default function Auth() {
           </TooltipTrigger>
         </SidebarMenuButton>
       ) : (
-        <Sheet>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <SidebarMenuButton asChild>
               <TooltipTrigger className="cursor-pointer">
@@ -40,7 +42,7 @@ export default function Auth() {
               </TooltipTrigger>
             </SidebarMenuButton>
           </SheetTrigger>
-          <AuthSheet />
+          <AuthSheet setIsOpen={setIsOpen}/>
         </Sheet>
       )}
       <TooltipContent side="right">

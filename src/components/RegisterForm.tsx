@@ -33,7 +33,7 @@ const formSchema = z
 export function RegisterForm({
   setFormType,
 }: {
-  setFormType: Dispatch<SetStateAction<"login" | "register" | 'forgot'>>;
+  setFormType: Dispatch<SetStateAction<"login" | "register" | "forgot">>;
 }) {
   const [isPending, startTransition] = useTransition();
   const onRegisterSubmit = async (data: RegisterFormDataType) => {
@@ -41,7 +41,7 @@ export function RegisterForm({
       try {
         await register(data);
         toast("Successfully registered");
-        form.reset();
+        setFormType("login");
       } catch (e) {
         if (e instanceof Error) {
           if (e.message === "Email already taken") {
@@ -116,7 +116,7 @@ export function RegisterForm({
           )}
         />
         <Button type="submit" disabled={isPending} className="w-full">
-          Register
+          {isPending ? "Registering..." : "Register"}
         </Button>
       </form>
       <div>

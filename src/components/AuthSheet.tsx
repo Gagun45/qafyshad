@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { LoginForm } from "./LoginForm";
 import {
   SheetContent,
@@ -9,7 +9,11 @@ import {
 import { RegisterForm } from "./RegisterForm";
 import { ForgotForm } from "./ForgotForm";
 
-export default function AuthSheet() {
+export default function AuthSheet({
+  setIsOpen,
+}: {
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+}) {
   const [formType, setFormType] = useState<"login" | "register" | "forgot">(
     "login"
   );
@@ -28,7 +32,7 @@ export default function AuthSheet() {
         </SheetTitle>
         <SheetDescription asChild>
           {formType === "login" ? (
-            <LoginForm setFormType={setFormType} />
+            <LoginForm setFormType={setFormType} setIsOpen={setIsOpen} />
           ) : formType === "register" ? (
             <RegisterForm setFormType={setFormType} />
           ) : formType === "forgot" ? (

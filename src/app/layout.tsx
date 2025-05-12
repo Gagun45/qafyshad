@@ -45,7 +45,7 @@ export default function RootLayout({
               <main className="w-full">
                 <Navbar />
                 <div className="p-2">{children}</div>
-                <Toaster closeButton richColors position="top-center" />
+                <Toaster richColors position="bottom-center" duration={2000} />
               </main>
             </SidebarProvider>
           </ThemeProvider>
