@@ -67,6 +67,11 @@ export function LoginForm({
   return (
     <Form {...form}>
       <form className="space-y-8" onSubmit={form.handleSubmit(onLoginSubmit)}>
+        {form.formState.errors.root && (
+          <div className="text-red-500">
+            {form.formState.errors.root.message}
+          </div>
+        )}
         <FormField
           control={form.control}
           name="email"

@@ -4,6 +4,7 @@ import { signIn } from "./auth";
 import { dbConnect } from "./dbconnect";
 import { User } from "./models";
 import crypto from "crypto";
+import nodemailer from "nodemailer";
 
 export type RegisterFormDataType = {
   email: string;
@@ -80,10 +81,32 @@ export const forgot = async (email: string) => {
     user.resetPasswordToken = newToken;
     user.resetPasswordTokenExpiry = expiryDate;
     await user.save();
+    await sendForgotLink(email, newToken);
   } catch (e) {
     if (e instanceof Error) {
       if (e.message === "No such user") throw new Error(e.message);
     }
+    throw new Error("Something went wrong");
+  }
+};
+
+const sendForgotLink = async (to: string, resetPasswordToken: string) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_EMAIL,
+        pass: process.env.GMAIL_PASS,
+      },
+    });
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetPasswordToken}`;
+    await transporter.sendMail({
+      from: "Shadcn test",
+      to,
+      subject: "Reset link",
+      html: `Click <a href=${resetUrl}>here</a> to reset your password`,
+    });
+  } catch {
     throw new Error("Something went wrong");
   }
 };

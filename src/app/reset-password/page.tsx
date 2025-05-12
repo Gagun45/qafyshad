@@ -11,7 +11,7 @@ export default async function ResetPage({ searchParams }: Props) {
   await dbConnect();
   const user = await User.findOne({
     resetPasswordToken: token,
-    resetPasswordTokenExpiry: { $gt: new Date() },
+    resetPasswordTokenExpiry: { $gt: Date.now() },
   });
 
   if (!user) {

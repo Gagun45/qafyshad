@@ -25,8 +25,10 @@ const formSchema = z.object({
 
 export function ForgotForm({
   setFormType,
+  setIsOpen,
 }: {
   setFormType: Dispatch<SetStateAction<"login" | "register" | "forgot">>;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const [isPending, startTransition] = useTransition();
   const onForgotSubmit = async (data: { email: string }) => {
@@ -34,7 +36,7 @@ export function ForgotForm({
       try {
         await forgot(data.email);
         toast(`Link successfully sent to ${data.email}`);
-        setFormType("login");
+        setIsOpen(false);
       } catch (e) {
         if (e instanceof Error) {
           if (e.message === "No such user") {

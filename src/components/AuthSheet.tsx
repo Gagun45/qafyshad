@@ -36,7 +36,7 @@ export default function AuthSheet({
           ) : formType === "register" ? (
             <RegisterForm setFormType={setFormType} />
           ) : formType === "forgot" ? (
-            <ForgotForm setFormType={setFormType} />
+            <ForgotForm setFormType={setFormType} setIsOpen={setIsOpen}/>
           ) : null}
         </SheetDescription>
       </SheetHeader>
