@@ -1,19 +1,12 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "./ui/sheet";
-import { Button } from "./ui/button";
+import { signOut, useSession } from "next-auth/react";
+import { Sheet, SheetTrigger } from "./ui/sheet";
 import { LogInIcon, LogOutIcon } from "lucide-react";
 import { SidebarMenuButton, useSidebar } from "./ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { toast } from "sonner";
+import AuthSheet from "./AuthSheet";
 
 export default function Auth() {
   const { data: session } = useSession();
@@ -47,20 +40,7 @@ export default function Auth() {
               </TooltipTrigger>
             </SidebarMenuButton>
           </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Login</SheetTitle>
-              <SheetDescription asChild>
-                <Button
-                  onClick={() => signIn("google")}
-                  variant={"default"}
-                  className="text-background"
-                >
-                  Login via google
-                </Button>
-              </SheetDescription>
-            </SheetHeader>
-          </SheetContent>
+          <AuthSheet />
         </Sheet>
       )}
       <TooltipContent side="right">
