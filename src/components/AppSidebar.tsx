@@ -31,6 +31,7 @@ import {
 } from "./ui/tooltip";
 import Auth from "./Auth";
 import Profile from "./Profile";
+import { useSession } from "next-auth/react";
 
 const items = [
   { title: "Home", url: "/", icon: Home },
@@ -42,6 +43,7 @@ const items = [
 
 export default function AppSidebar() {
   const { isMobile, state, setOpen } = useSidebar();
+  const { data: session } = useSession();
   return (
     <TooltipProvider>
       <Sidebar collapsible="icon">
@@ -113,7 +115,7 @@ export default function AppSidebar() {
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem className="space-y-2">
-              <Profile />
+              {session && <Profile />}
               <Auth />
             </SidebarMenuItem>
           </SidebarMenu>

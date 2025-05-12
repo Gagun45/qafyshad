@@ -14,34 +14,30 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signIn } from "next-auth/react";
-import { forgot } from "@/lib/actions";
-import { useTransition, type Dispatch, type SetStateAction } from "react";
+import { reset } from "@/lib/actions";
+import { useTransition } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  email: z.string().email("Invalid email"),
+  password: z
+    .string()
+    .min(2, "Password must be 2 characters at least")
+    .max(24, "Password must be less than 25 characters"),
 });
 
-export function ForgotForm({
-  setFormType,
-}: {
-  setFormType: Dispatch<SetStateAction<"login" | "register" | "forgot">>;
-}) {
+export function ResetForm({ token }: { token: string }) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const onForgotSubmit = async (data: { email: string }) => {
+  const onResetSubmit = async (data: { password: string }) => {
     startTransition(async () => {
       try {
-        await forgot(data.email);
-        toast(`Link successfully sent to ${data.email}`);
-        setFormType("login");
+        await reset(data.password, token);
+        toast("New password successfully applied");
+        router.push("/");
       } catch (e) {
         if (e instanceof Error) {
-          if (e.message === "No such user") {
-            form.setError("email", { message: e.message });
-          } else {
-            form.setError("root", { message: e.message });
-          }
+          form.setError("root", { message: e.message });
         }
       }
     });
@@ -49,13 +45,16 @@ export function ForgotForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      password: "",
     },
     mode: "onChange",
   });
   return (
     <Form {...form}>
-      <form className="space-y-8" onSubmit={form.handleSubmit(onForgotSubmit)}>
+      <form
+        className="space-y-8 max-w-128"
+        onSubmit={form.handleSubmit(onResetSubmit)}
+      >
         {form.formState.errors.root && (
           <div className="text-red-500">
             {form.formState.errors.root.message}
@@ -64,12 +63,12 @@ export function ForgotForm({
 
         <FormField
           control={form.control}
-          name="email"
+          name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} type="password" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -80,23 +79,12 @@ export function ForgotForm({
           {isPending ? "Sending..." : "Send"}
         </Button>
       </form>
-      <div>
+      <div className="mt-8">
         Already have an account?{" "}
-        <button
-          className="underline-offset-1 underline cursor-pointer font-bold"
-          onClick={() => setFormType("login")}
-        >
+        <button className="underline-offset-1 underline cursor-pointer font-bold">
           Login
         </button>
       </div>
-      <Button
-        onClick={() => signIn("google")}
-        variant={"default"}
-        className="text-background"
-        disabled={isPending}
-      >
-        Login via google
-      </Button>
     </Form>
   );
 }

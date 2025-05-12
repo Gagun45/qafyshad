@@ -24,7 +24,7 @@ export default function Profile() {
           </PopoverTrigger>
         </TooltipTrigger>
         {session && (
-          <PopoverContent className="w-fit flex flex-col gap-2" side="top">
+          <PopoverContent className="w-fit flex flex-col gap-2" side="top" align="start">
             <div>
               <span>Email: {session?.user.email}</span>
               <Separator />
