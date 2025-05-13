@@ -1,10 +1,23 @@
 "use server";
 
+import type { Attachment } from "nodemailer/lib/mailer";
 import { signIn } from "./auth";
 import { dbConnect } from "./dbconnect";
 import { User } from "./models";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+
+// const BODY_SIZE_LIMIT = "10mb"; // NEXT.CONFIG.TS value !!! //
+
+const WORK_EMAIL = "selyanchyn45@gmail.com";
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_EMAIL,
+    pass: process.env.GMAIL_PASS,
+  },
+});
 
 export type RegisterFormDataType = {
   email: string;
@@ -17,10 +30,21 @@ export type LoginFormDataType = {
   password: string;
 };
 
+export type AttachmentType = {
+  file: File;
+  url: string;
+};
+
+export type RequestDataType = {
+  name: string;
+  contact: string;
+  device: string;
+  images?: AttachmentType[];
+};
+
 export const register = async (data: RegisterFormDataType) => {
   try {
-    const email = data.email;
-    const password = data.password;
+    const { email, password } = data;
     dbConnect();
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -43,8 +67,7 @@ export const register = async (data: RegisterFormDataType) => {
 
 export const login = async (data: LoginFormDataType) => {
   try {
-    const email = data.email;
-    const password = data.password;
+    const { email, password } = data;
     await dbConnect();
 
     const user = await User.findOne({ email });
@@ -92,13 +115,6 @@ export const forgot = async (email: string) => {
 
 const sendForgotLink = async (to: string, resetPasswordToken: string) => {
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_EMAIL,
-        pass: process.env.GMAIL_PASS,
-      },
-    });
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetPasswordToken}`;
     await transporter.sendMail({
       from: "Shadcn test",
@@ -128,5 +144,59 @@ export const reset = async (password: string, resetPasswordToken: string) => {
         throw new Error("Something went wrong");
       }
     }
+  }
+};
+
+const sendEmail = async (
+  to: string,
+  subject: string,
+  html: string,
+  attachments?: File[]
+) => {
+  try {
+    if (!attachments) {
+      await transporter.sendMail({
+        from: "ShadCn test",
+        to,
+        subject,
+        html,
+      });
+    } else {
+      const newFiles: Attachment[] = await Promise.all(
+        attachments.map(async (file) => ({
+          filename: file.name,
+          content: Buffer.from(await file.arrayBuffer()),
+          encoding: "base64",
+        }))
+      );
+      await transporter.sendMail({
+        from: "ShadCn test",
+        to,
+        subject,
+        html,
+        attachments: newFiles,
+      });
+    }
+  } catch {
+    throw new Error("Something went wrong");
+  }
+};
+
+export const request = async (data: RequestDataType) => {
+  try {
+    const { name, contact, device, images } = data;
+    const subject = "New request";
+    const html = `New request has been submitted!<br/>
+    ----------------------------<br/>
+    Information:<br/>
+    Name: ${name}<br/>
+    Contact: ${contact}<br/>
+    Device: ${device}<br/>
+    ----------------------------<br/>
+    `;
+    const attachments = images?.map((image) => image.file);
+    await sendEmail(WORK_EMAIL, subject, html, attachments);
+  } catch {
+    throw new Error("Something went wrong");
   }
 };

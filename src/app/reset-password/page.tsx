@@ -8,6 +8,13 @@ interface Props {
 
 export default async function ResetPage({ searchParams }: Props) {
   const token = (await searchParams)?.token;
+
+  if (!token) {
+    return <div>No token provided</div>;
+  }
+  if (token.length != 64) {
+    return <div>Wrong token</div>;
+  }
   await dbConnect();
   const user = await User.findOne({
     resetPasswordToken: token,

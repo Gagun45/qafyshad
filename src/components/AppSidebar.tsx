@@ -42,7 +42,7 @@ const items = [
 ];
 
 export default function AppSidebar() {
-  const { isMobile, state, setOpen } = useSidebar();
+  const { isMobile, state, setOpen, setOpenMobile } = useSidebar();
   const { data: session } = useSession();
   return (
     <TooltipProvider>
@@ -51,7 +51,14 @@ export default function AppSidebar() {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link href="/" className="h-12" onClick={() => setOpen(false)}>
+                <Link
+                  href="/"
+                  className="h-12"
+                  onClick={() => {
+                    setOpenMobile(false);
+                    setOpen(false);
+                  }}
+                >
                   <Image
                     src="/qafyLogo.png"
                     alt="logo"
@@ -84,7 +91,13 @@ export default function AppSidebar() {
                     >
                       <TooltipTrigger asChild>
                         <SidebarMenuButton asChild>
-                          <Link href={item.url} onClick={() => setOpen(false)}>
+                          <Link
+                            href={item.url}
+                            onClick={() => {
+                              setOpenMobile(false);
+                              setOpen(false);
+                            }}
+                          >
                             <item.icon className="size-4" />
 
                             <span>{item.title}</span>

@@ -11,7 +11,7 @@ import { useState } from "react";
 
 export default function Auth() {
   const { data: session } = useSession();
-  const { isMobile, state, setOpen } = useSidebar();
+  const { isMobile, state, setOpen, setOpenMobile } = useSidebar();
   const [isOpen, setIsOpen] = useState(false);
   return (
     <Tooltip
@@ -22,6 +22,7 @@ export default function Auth() {
           onClick={async () => {
             await signOut({ redirect: false });
             setOpen(false);
+            setOpenMobile(false);
             toast("You logged out successfully.", { duration: 2000 });
           }}
           asChild
@@ -36,7 +37,12 @@ export default function Auth() {
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <SidebarMenuButton asChild>
-              <TooltipTrigger className="cursor-pointer">
+              <TooltipTrigger
+                className="cursor-pointer"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
                 <LogInIcon />
                 <span>Login</span>
               </TooltipTrigger>
