@@ -107,28 +107,32 @@ export function RequestForm() {
   const [zoomed, setZoomed] = useState<AttachmentType | null>();
   const [overallSize, setOverallSize] = useState(0);
   const [popoverIsOpen, setPopoverIsOpen] = useState(false);
-  // const [dialogIsOpen, setDialogIsOpen] = useState(false);
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
-  // useEffect(() => {
-  //   if (zoomed) {
-  //     window.history.pushState({ dialog: true }, "");
-  //   }
-  //   const handlePopState = (event: PopStateEvent) => {
-  //     if (zoomed) {
-  //       setZoomed(null)
+  const hasPushedRef = useRef(false);
 
-  //       event.preventDefault();
-  //     }
-  //   };
-  //   window.addEventListener("popstate", handlePopState);
+  useEffect(() => {
+    const handlePopState = () => {
+      if (hasPushedRef && dialogIsOpen) {
+        setDialogIsOpen(false);
+        hasPushedRef.current = false;
+      }
+    };
+    if (dialogIsOpen && !hasPushedRef.current) {
+      window.history.pushState({ dialog: true }, "");
+      hasPushedRef.current = true;
+    }
 
-  //   return () => {
-  //     window.removeEventListener("popstate", handlePopState);
-  //     if (zoomed) {
-  //       window.history.back();
-  //     }
-  //   };
-  // }, [dialogIsOpen]);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      if (hasPushedRef.current && dialogIsOpen) {
+        window.history.back();
+        hasPushedRef.current = false;
+      }
+    };
+  }, [dialogIsOpen]);
 
   const buttonClick = () => {
     imageRef.current?.click();
@@ -281,7 +285,7 @@ export function RequestForm() {
               <FormControl>
                 <Textarea
                   placeholder="Description"
-                  className="resize-none min-h-32"
+                  className="resize-none min-h-24"
                   {...field}
                 />
               </FormControl>
@@ -348,7 +352,10 @@ export function RequestForm() {
                     alt="image"
                     className="w-full h-full object-contain"
                     fill
-                    onClick={() => setZoomed(attachment)}
+                    onClick={() => {
+                      setZoomed(attachment);
+                      setDialogIsOpen(true);
+                    }}
                   />
                   <ZoomInIcon className="absolute opacity-0 transition-opacity duration-300 pointer-events-none group-hover:opacity-100 inset-0 bg-black/85 p-6 w-full h-full flex justify-center items-center" />
                 </div>
@@ -382,9 +389,9 @@ export function RequestForm() {
         </Button>
       </form>
       {zoomed && (
-        <Dialog open={true} onOpenChange={() => setZoomed(null)}>
+        <Dialog open={dialogIsOpen} onOpenChange={setDialogIsOpen}>
           <DialogContent
-            onClick={() => setZoomed(null)}
+            onClick={() => setDialogIsOpen(false)}
             className="!h-full !w-full !max-w-none flex flex-col rounded-none"
           >
             <DialogTitle className="text-center">

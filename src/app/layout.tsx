@@ -49,7 +49,7 @@ export default function RootLayout({
             </SidebarProvider>
           </ThemeProvider>
         </SessionProvider>
-        <Toaster richColors position="bottom-center" duration={4000} />
+        <Toaster richColors position="bottom-center" duration={4000} className="max-w-full" />
       </body>
     </html>
   );

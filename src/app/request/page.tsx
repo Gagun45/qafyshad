@@ -20,7 +20,7 @@ const items = [
 export default function RequestPage() {
   return (
     <div className="flex w-full h-full flex-col items-center gap-4">
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center gap-0">
         <h1 className="text-4xl font-bold">Request</h1>
         <h2 className="font-semibold">
           Create a request and we will contact you
@@ -30,11 +30,11 @@ export default function RequestPage() {
             How it works?
           </PopoverTrigger>
 
-          <PopoverContent className="relative flex flex-col w-fit gap-12 text-justify py-8 px-8">
+          <PopoverContent className="relative flex flex-col w-fit max-w-screen gap-10 md:gap-12 text-justify py-4 md:py-8 px-4 md:px-8">
             {items.map((item) => (
               <div key={item} className="flex gap-2 items-center">
                 <Circle className="size-3 rounded-full bg-foreground" />
-                <p className="text-lg">{item}</p>
+                <p className="text-base md:text-lg">{item}</p>
               </div>
             ))}
             <Button asChild variant={"ghost"} className="!p-0 h-auto">
