@@ -35,13 +35,14 @@ export function ForgotForm({
     startTransition(async () => {
       try {
         await forgot(data.email);
-        toast(`Link successfully sent to ${data.email}`);
+        toast.success(`Link successfully sent to ${data.email}`);
         setIsOpen(false);
       } catch (e) {
         if (e instanceof Error) {
           if (e.message === "No such user") {
             form.setError("email", { message: e.message });
           } else {
+            toast.error('Something went wrong')
             form.setError("root", { message: e.message });
           }
         }

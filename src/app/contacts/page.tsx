@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 
 interface ContactInterface {
   label: string;
@@ -63,10 +64,10 @@ export default function Contacts() {
         </h2>
         <h2 className="pageSubHeading font-bold text-sm">No answer to calls</h2>
       </header>
-      <div className="grid grid-cols-1 gap-12 mx-auto max-w-lg ">
-        <div className="flex items-center gap-2">
-          <div className="self-start flex items-center gap-2">
-            <MapPin size={28} />
+      <div className="flex flex-col gap-12 mx-auto max-w-lg ">
+        <div className="grid grid-cols-[40%_60%] items-center gap-6">
+          <div className="self-start flex items-center gap-2 flex-wrap">
+            <MapPin className="size-5 md:size-8 flex-shrink-0" />
             <span>Address:</span>
           </div>
           <Sheet>
@@ -94,36 +95,43 @@ export default function Contacts() {
           </Sheet>
         </div>
         {ITEMS.map((item) => (
-          <div key={item.label} className="flex items-center gap-2">
-            <item.icon size={28} />
-            <span>{item.label}:</span>
+          <div key={item.label} className="grid grid-cols-[40%_60%] gap-6">
+            <div className="flex items-center gap-2 flex-wrap">
+              <item.icon className="size-5 md:size-8 flex-shrink-0" />
+              <span>{item.label}:</span>
+            </div>
 
             <Link href={item.link} className="underline underline-offset-2">
               {item.contact}
             </Link>
           </div>
         ))}
-        <div className="flex items-center gap-2">
-          <MdEmail size={28} />
-          <span>Email:</span>
-          <span className="mr-2">qafy42@gmail.com</span>
-          <Tooltip>
-            <TooltipTrigger className="cursor-pointer">
-              {isNaviAvailable && (
-                <CopyIcon
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText("qafy42@gmail.com");
-                      toast.success("Email copied!", { duration: 1000 });
-                    } catch {
-                      toast.error("Failed to copy", { duration: 1000 });
-                    }
-                  }}
-                />
-              )}
-            </TooltipTrigger>
-            <TooltipContent>Copy</TooltipContent>
-          </Tooltip>
+        <div className="grid grid-cols-[40%_60%] gap-6">
+          <div className="flex items-center gap-2 flex-wrap">
+            <MdEmail className="size-5 md:size-8 flex-shrink-0" />
+            <span>Email:</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge className="text-base">qafy42@gmail.com</Badge>
+            <Tooltip>
+              <TooltipTrigger className="cursor-pointer">
+                {isNaviAvailable && (
+                  <CopyIcon
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText("qafy42@gmail.com");
+                        toast.success("Email copied!", { duration: 1000 });
+                      } catch {
+                        toast.error("Failed to copy", { duration: 1000 });
+                      }
+                    }}
+                    size={16}
+                  />
+                )}
+              </TooltipTrigger>
+              <TooltipContent>Copy</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
       </div>
     </main>

@@ -22,8 +22,12 @@ import { useRouter } from "next/navigation";
 const formSchema = z.object({
   password: z
     .string()
-    .min(2, "Password must be 2 characters at least")
-    .max(24, "Password must be less than 25 characters"),
+    .min(8, "Password must be at least 8 characters long")
+    .max(24, "Password must be at most 24 characters long")
+    .regex(
+      /^[a-zA-Z0-9!@#$%^&*()_+\-=]+$/,
+      "Password can only contain letters, digits and !@#$%^&*()_+-="
+    ),
 });
 
 export function ResetForm({ token }: { token: string }) {
@@ -33,9 +37,10 @@ export function ResetForm({ token }: { token: string }) {
     startTransition(async () => {
       try {
         await reset(data.password, token);
-        toast("New password successfully applied");
+        toast.success("New password successfully applied");
         router.push("/");
       } catch (e) {
+        toast.error('Something went wrong')
         if (e instanceof Error) {
           form.setError("root", { message: e.message });
         }

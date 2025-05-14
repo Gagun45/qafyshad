@@ -22,7 +22,14 @@ import { useTransition, type Dispatch, type SetStateAction } from "react";
 const formSchema = z
   .object({
     email: z.string().email("Invalid email"),
-    password: z.string().min(2, "Password must be at least 2 characters"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters long")
+      .max(24, "Password must be at most 24 characters long")
+      .regex(
+        /^[a-zA-Z0-9!@#$%^&*()_+\-=]+$/,
+        "Password can only contain letters, digits and !@#$%^&*()_+-="
+      ),
     passwordConfirm: z.string(),
   })
   .refine((data) => data.password === data.passwordConfirm, {
@@ -40,13 +47,14 @@ export function RegisterForm({
     startTransition(async () => {
       try {
         await register(data);
-        toast("Successfully registered");
+        toast.success("Successfully registered");
         setFormType("login");
       } catch (e) {
         if (e instanceof Error) {
           if (e.message === "Email already taken") {
             form.setError("email", { message: e.message });
           } else {
+            toast.error('Something went wrong')
             form.setError("root", { message: e.message });
           }
         }

@@ -475,10 +475,11 @@ export function RequestForm() {
     startTransition(async () => {
       try {
         await request(data);
-        toast("Request has been submitted!");
+        toast.success("Request has been submitted!");
         form.reset();
         setAttached([]);
       } catch {
+        toast.error('Something went wrong')
         form.setError("root", { message: "Something went wrong" });
       } finally {
         setAlertIsOpen(false);

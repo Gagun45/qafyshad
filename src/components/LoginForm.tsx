@@ -21,7 +21,14 @@ import { toast } from "sonner";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email"),
-  password: z.string().min(2, "Password must be at least 2 characters"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters long")
+    .max(24, "Password must be at most 24 characters long")
+    .regex(
+      /^[a-zA-Z0-9!@#$%^&*()_+\-=]+$/,
+      "Password can only contain letters, digits and !@#$%^&*()_+-="
+    ),
 });
 
 export function LoginForm({
@@ -49,7 +56,7 @@ export function LoginForm({
       try {
         await login(data);
         await update();
-        toast("You logged in successfully");
+        toast.success("You logged in successfully");
         setIsOpen(false);
       } catch (e) {
         if (e instanceof Error) {
@@ -58,6 +65,7 @@ export function LoginForm({
           } else if (e.message === "Wrong password") {
             form.setError("password", { message: e.message });
           } else {
+            toast.error("Something went wrong");
             form.setError("root", { message: e.message });
           }
         }
