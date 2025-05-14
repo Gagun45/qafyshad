@@ -10,11 +10,13 @@ export default function Navbar() {
         <SidebarTrigger />
       </div>
       <div className="w-1/3 flex justify-center">
-        <Button>
+        <Button asChild>
           <Link href="/request">Request</Link>
         </Button>
       </div>
-      <span className="w-1/3 text-end">Qafy Mobile</span>
+      <Link href="/" className="w-1/3 text-end">
+        Home
+      </Link>
       <Separator className="md:hidden absolute -bottom-[1px] left-0 w-full" />
     </nav>
   );

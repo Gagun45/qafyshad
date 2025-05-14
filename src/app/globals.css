@@ -120,4 +120,8 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  main {
+    @apply max-w-3xl mx-auto px-4 pt-2 leading-relaxed font-sans xl:pt-4
+  }
 }

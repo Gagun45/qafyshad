@@ -42,10 +42,10 @@ export default function RootLayout({
           >
             <SidebarProvider>
               <AppSidebar />
-              <main className="w-full">
+              <div className="w-full">
                 <Navbar />
-                <div className="p-2">{children}</div>
-              </main>
+                <main>{children}</main>
+              </div>
             </SidebarProvider>
           </ThemeProvider>
         </SessionProvider>

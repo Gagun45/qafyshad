@@ -19,7 +19,7 @@ const items = [
 
 export default function RequestPage() {
   return (
-    <div className="flex w-full h-full flex-col items-center gap-4">
+    <main className="flex w-full h-full flex-col items-center gap-4">
       <div className="flex flex-col items-center gap-0">
         <h1 className="text-4xl font-bold">Request</h1>
         <h2 className="font-semibold">
@@ -46,6 +46,6 @@ export default function RequestPage() {
         </Popover>
       </div>
       <RequestForm />
-    </div>
+    </main>
   );
 }

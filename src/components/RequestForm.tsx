@@ -194,7 +194,7 @@ export function RequestForm() {
               <Popover open={popoverIsOpen} onOpenChange={setPopoverIsOpen}>
                 <PopoverTrigger asChild>
                   <AlertCircleIcon
-                    className="size-5 text-chart-1"
+                    className="size-5 text-chart-2"
                     onMouseEnter={() => setPopoverIsOpen(true)}
                     onMouseLeave={() => setPopoverIsOpen(false)}
                   />
@@ -275,7 +275,7 @@ export function RequestForm() {
             >
               <PopoverTrigger asChild>
                 <AlertCircleIcon
-                  className="size-5 text-chart-1"
+                  className="size-5 text-chart-2"
                   onMouseEnter={() => setPopoverIsOpenDesc(true)}
                   onMouseLeave={() => setPopoverIsOpenDesc(false)}
                 />
@@ -496,7 +496,7 @@ export function RequestForm() {
   return (
     <Form {...form}>
       <form
-        className="space-y-8 max-w-112 w-4/5"
+        className="space-y-8 max-w-xl w-full"
         onSubmit={form.handleSubmit(onResetSubmit)}
       >
         {form.formState.errors.root && (
