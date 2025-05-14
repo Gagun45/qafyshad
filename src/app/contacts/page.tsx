@@ -17,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 interface ContactInterface {
   label: string;
@@ -47,10 +48,16 @@ const ITEMS: ContactInterface[] = [
 ];
 
 export default function Contacts() {
+  const [isNaviAvailable, setIsNaviAvailable] = useState(false);
+  useEffect(() => {
+    if (navigator.clipboard) {
+      setIsNaviAvailable(true);
+    }
+  }, []);
   return (
     <main className="text-lg sm:text-2xl">
-      <header className="mb-4">
-        <h1 className="pageHeading mb-0">Contacts</h1>
+      <header>
+        <h1 className="pageHeading">Contacts</h1>
         <h2 className="pageSubHeading text-muted-foreground italic text-sm">
           You can only contact me via correspondence or in person
         </h2>
@@ -90,14 +97,10 @@ export default function Contacts() {
           <div key={item.label} className="flex items-center gap-2">
             <item.icon size={28} />
             <span>{item.label}:</span>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link href={item.link} className="underline underline-offset-2">
-                  {item.contact}
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>Open {item.label}</TooltipContent>
-            </Tooltip>
+
+            <Link href={item.link} className="underline underline-offset-2">
+              {item.contact}
+            </Link>
           </div>
         ))}
         <div className="flex items-center gap-2">
@@ -106,16 +109,18 @@ export default function Contacts() {
           <span className="mr-2">qafy42@gmail.com</span>
           <Tooltip>
             <TooltipTrigger className="cursor-pointer">
-              <CopyIcon
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText("qafy42@gmail.com");
-                    toast.success("Email copied!", { duration: 1000 });
-                  } catch {
-                    toast.error("Failed to copy", { duration: 1000 });
-                  }
-                }}
-              />
+              {isNaviAvailable && (
+                <CopyIcon
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText("qafy42@gmail.com");
+                      toast.success("Email copied!", { duration: 1000 });
+                    } catch {
+                      toast.error("Failed to copy", { duration: 1000 });
+                    }
+                  }}
+                />
+              )}
             </TooltipTrigger>
             <TooltipContent>Copy</TooltipContent>
           </Tooltip>

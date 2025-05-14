@@ -1,6 +1,8 @@
 import { ResetForm } from "@/components/ResetForm";
+import { Button } from "@/components/ui/button";
 import { dbConnect } from "@/lib/dbconnect";
 import { User } from "@/lib/models";
+import Link from "next/link";
 
 interface Props {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -9,11 +11,19 @@ interface Props {
 export default async function ResetPage({ searchParams }: Props) {
   const token = (await searchParams)?.token;
 
-  if (!token) {
-    return <div>No token provided</div>;
-  }
-  if (token.length != 64) {
-    return <div>Wrong token</div>;
+  const invalidToken = (message: string) => {
+    return (
+      <main className="flex flex-col gap-4 text-4xl">
+        <span>{message}</span>
+        <Button asChild className="w-fit" size={"lg"}>
+          <Link href="/">Homepage</Link>
+        </Button>
+      </main>
+    );
+  };
+
+  if (!token || token.length != 64) {
+    return invalidToken("Invalid token");
   }
   await dbConnect();
   const user = await User.findOne({
@@ -22,13 +32,13 @@ export default async function ResetPage({ searchParams }: Props) {
   });
 
   if (!user) {
-    return <div>Invalid token</div>;
+    return invalidToken("Invalid or expired token");
   }
   return (
-    <main className="space-y-4">
-      <div className="flex flex-col items-center gap-0">
-        <h1 className="text-4xl font-bold">Reset Password</h1>
-      </div>
+    <main>
+      <header>
+        <h1 className="pageHeading">Reset Password</h1>
+      </header>
       <ResetForm token={token as string} />
     </main>
   );

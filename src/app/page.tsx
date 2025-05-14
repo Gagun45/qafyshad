@@ -9,12 +9,8 @@ export default function HomePage() {
     <main className="text-justify text-lg sm:text-2xl">
       <header>
         <h1 className="pageHeading">
-          <span style={{ color: "blue" }}>Qafy</span>{" "}
-          <span style={{ color: "yellow" }}>Mobile</span>
-        </h1>
-        <h2 className="pageSubHeading">
           Your reliable electronics repair service in Germany
-        </h2>
+        </h1>
       </header>
       <div className="flex flex-col gap-12 md:gap-18 md:text-2xl">
         {ITEMS.map((item) => (

@@ -14,7 +14,7 @@ const ITEMS = [
 export default function ServicesPage() {
   return (
     <main className="text-justify text-lg sm:text-2xl">
-      <header className="mb-4">
+      <header>
         <h1 className="pageHeading">Our services</h1>
         <h2 className="pageSubHeading text-muted-foreground">
           We offer a wide range of repair and maintenance services to keep your

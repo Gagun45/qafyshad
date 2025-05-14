@@ -20,9 +20,9 @@ const items = [
 export default function RequestPage() {
   return (
     <main className="flex w-full h-full flex-col items-center gap-4">
-      <div className="flex flex-col items-center gap-0">
-        <h1 className="text-4xl font-bold">Request</h1>
-        <h2 className="font-semibold">
+      <header>
+        <h1 className="pageHeading">Request</h1>
+        <h2 className="pageSubHeading">
           Create a request and we will contact you
         </h2>
         <Popover>
@@ -44,7 +44,7 @@ export default function RequestPage() {
             </Button>
           </PopoverContent>
         </Popover>
-      </div>
+      </header>
       <RequestForm />
     </main>
   );
