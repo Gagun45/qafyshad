@@ -8,6 +8,7 @@ export default function Navbar() {
     <nav className="p-2 h-16 flex items-center justify-start sticky top-0 bg-background z-10">
       <div className="w-1/3">
         <SidebarTrigger />
+        <span className="sr-only">Toggle sidebar</span>
       </div>
       <div className="w-1/3 flex justify-center">
         <Button asChild>

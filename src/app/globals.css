@@ -122,6 +122,20 @@
   }
 
   main {
-    @apply max-w-3xl mx-auto px-4 pt-2 leading-relaxed font-sans xl:pt-4
+    @apply max-w-3xl mx-auto px-4 py-2 leading-relaxed font-sans xl:py-4
+  }
+
+  header {
+    @apply mb-10 md:mb-20 flex flex-col items-center text-center
+  }
+}
+
+@layer components {
+  .pageHeading {
+    @apply text-5xl md:text-6xl font-bold mb-2
+  }
+
+  .pageSubHeading {
+    @apply text-lg md:text-2xl font-semibold
   }
 }

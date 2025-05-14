@@ -7,13 +7,15 @@ const ITEMS = [
 export default function HomePage() {
   return (
     <main className="text-justify text-lg sm:text-2xl">
-      <h1 className="text-5xl md:text-6xl font-bold mb-4 text-center">
-        <span style={{ color: "blue" }}>Qafy</span>{" "}
-        <span style={{ color: "yellow" }}>Mobile</span>
-      </h1>
-      <h2 className="text-2xl md:text-3xl font-bold mb-10 md:mb-20 text-center">
-        Your reliable electronics repair service in Germany
-      </h2>
+      <header>
+        <h1 className="pageHeading">
+          <span style={{ color: "blue" }}>Qafy</span>{" "}
+          <span style={{ color: "yellow" }}>Mobile</span>
+        </h1>
+        <h2 className="pageSubHeading">
+          Your reliable electronics repair service in Germany
+        </h2>
+      </header>
       <div className="flex flex-col gap-12 md:gap-18 md:text-2xl">
         {ITEMS.map((item) => (
           <section key={item}>
