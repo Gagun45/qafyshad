@@ -25,8 +25,10 @@ export default async function ResetPage({ searchParams }: Props) {
     return <div>Invalid token</div>;
   }
   return (
-    <div>
-      Reset Form
+    <div className="flex w-full h-full flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-0">
+        <h1 className="text-4xl font-bold">Reset Password</h1>
+      </div>
       <ResetForm token={token as string} />
     </div>
   );

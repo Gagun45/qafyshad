@@ -52,7 +52,7 @@ export function ResetForm({ token }: { token: string }) {
   return (
     <Form {...form}>
       <form
-        className="space-y-8 max-w-128"
+        className="space-y-8 max-w-112 w-4/5"
         onSubmit={form.handleSubmit(onResetSubmit)}
       >
         {form.formState.errors.root && (
@@ -66,7 +66,7 @@ export function ResetForm({ token }: { token: string }) {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>New password</FormLabel>
               <FormControl>
                 <Input {...field} type="password" />
               </FormControl>
@@ -76,15 +76,9 @@ export function ResetForm({ token }: { token: string }) {
         />
 
         <Button type="submit" disabled={isPending} className="w-full">
-          {isPending ? "Sending..." : "Send"}
+          {isPending ? "Applying..." : "Apply"}
         </Button>
       </form>
-      <div className="mt-8">
-        Already have an account?{" "}
-        <button className="underline-offset-1 underline cursor-pointer font-bold">
-          Login
-        </button>
-      </div>
     </Form>
   );
 }
