@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { reset } from "@/lib/actions";
-import { useTransition } from "react";
+
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -32,20 +32,17 @@ const formSchema = z.object({
 
 export function ResetForm({ token }: { token: string }) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
   const onResetSubmit = async (data: { password: string }) => {
-    startTransition(async () => {
-      try {
-        await reset(data.password, token);
-        toast.success("New password successfully applied");
-        router.push("/");
-      } catch (e) {
-        toast.error('Something went wrong')
-        if (e instanceof Error) {
-          form.setError("root", { message: e.message });
-        }
+    try {
+      await reset(data.password, token);
+      toast.success("New password successfully applied");
+      router.push("/");
+    } catch (e) {
+      toast.error("Something went wrong");
+      if (e instanceof Error) {
+        form.setError("root", { message: e.message });
       }
-    });
+    }
   };
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,11 +54,11 @@ export function ResetForm({ token }: { token: string }) {
   return (
     <Form {...form}>
       <form
-        className="space-y-8 max-w-112 w-4/5"
+        className="space-y-8 mx-auto max-w-112 w-4/5"
         onSubmit={form.handleSubmit(onResetSubmit)}
       >
         {form.formState.errors.root && (
-          <div className="text-red-500">
+          <div className="text-destructive">
             {form.formState.errors.root.message}
           </div>
         )}
@@ -73,15 +70,19 @@ export function ResetForm({ token }: { token: string }) {
             <FormItem>
               <FormLabel>New password</FormLabel>
               <FormControl>
-                <Input {...field} type="password" />
+                <Input {...field} type="password" disabled={form.formState.isSubmitting}/>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" disabled={isPending} className="w-full">
-          {isPending ? "Applying..." : "Apply"}
+        <Button
+          type="submit"
+          disabled={form.formState.isSubmitting || !form.formState.isValid}
+          className="w-full"
+        >
+          {form.formState.isSubmitting ? "Applying..." : "Apply"}
         </Button>
       </form>
     </Form>

@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
 import { register, type RegisterFormDataType } from "@/lib/actions";
 import { toast } from "sonner";
-import { useTransition, type Dispatch, type SetStateAction } from "react";
+import { type Dispatch, type SetStateAction } from "react";
 
 const formSchema = z
   .object({
@@ -42,24 +42,21 @@ export function RegisterForm({
 }: {
   setFormType: Dispatch<SetStateAction<"login" | "register" | "forgot">>;
 }) {
-  const [isPending, startTransition] = useTransition();
   const onRegisterSubmit = async (data: RegisterFormDataType) => {
-    startTransition(async () => {
-      try {
-        await register(data);
-        toast.success("Successfully registered");
-        setFormType("login");
-      } catch (e) {
-        if (e instanceof Error) {
-          if (e.message === "Email already taken") {
-            form.setError("email", { message: e.message });
-          } else {
-            toast.error("Something went wrong");
-            form.setError("root", { message: e.message });
-          }
+    try {
+      await register(data);
+      toast.success("Successfully registered");
+      setFormType("login");
+    } catch (e) {
+      if (e instanceof Error) {
+        if (e.message === "Email already taken") {
+          form.setError("email", { message: e.message });
+        } else {
+          toast.error("Something went wrong");
+          form.setError("root", { message: e.message });
         }
       }
-    });
+    }
   };
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,80 +69,86 @@ export function RegisterForm({
   });
   return (
     <Form {...form}>
-        <form
-          className="space-y-8 px-2 pb-80"
-          onSubmit={form.handleSubmit(onRegisterSubmit)}
-        >
-          {form.formState.errors.root && (
-            <div className="text-red-500">
-              {form.formState.errors.root.message}
-            </div>
-          )}
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input {...field} type="password" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="passwordConfirm"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password repeat</FormLabel>
-                <FormControl>
-                  <Input {...field} type="password" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" disabled={isPending} className="w-full">
-            {isPending ? "Registering..." : "Register"}
-          </Button>
-
-          <div className="text-center">
-            Already have an account?{" "}
-            <Button
-              type="button"
-              variant={"formLink"}
-              onClick={() => setFormType("login")}
-            >
-              Login
-            </Button>
+      <form
+        className="space-y-8 px-2 pb-80 overflow-auto"
+        onSubmit={form.handleSubmit(onRegisterSubmit)}
+      >
+        {form.formState.errors.root && (
+          <div className="text-destructive">
+            {form.formState.errors.root.message}
           </div>
+        )}
+
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input {...field} autoFocus disabled={form.formState.isSubmitting}/>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input {...field} type="password" disabled={form.formState.isSubmitting}/>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="passwordConfirm"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password repeat</FormLabel>
+              <FormControl>
+                <Input {...field} type="password" disabled={form.formState.isSubmitting}/>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button
+          type="submit"
+          disabled={form.formState.isSubmitting || !form.formState.isValid}
+          className="w-full"
+        >
+          {form.formState.isSubmitting ? "Registering..." : "Register"}
+        </Button>
+
+        <div className="text-center">
+          Already have an account?{" "}
           <Button
             type="button"
-            onClick={() => signIn("google")}
-            variant={"default"}
-            className="flex mx-auto"  
+            variant={"formLink"}
+            onClick={() => setFormType("login")}
+            disabled={form.formState.isSubmitting}
           >
-            Login via google
+            Login
           </Button>
-        </form>
+        </div>
+        <Button
+          type="button"
+          onClick={() => signIn("google")}
+          variant={"default"}
+          className="flex mx-auto"
+          disabled={form.formState.isSubmitting}
+        >
+          Login via google
+        </Button>
+      </form>
     </Form>
   );
 }

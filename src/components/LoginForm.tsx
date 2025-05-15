@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signIn, useSession } from "next-auth/react";
-import { useTransition, type Dispatch, type SetStateAction } from "react";
+import { type Dispatch, type SetStateAction } from "react";
 import { login, type LoginFormDataType } from "@/lib/actions";
 import { toast } from "sonner";
 
@@ -47,39 +47,35 @@ export function LoginForm({
     mode: "onChange",
   });
 
-  const [isPending, startTransition] = useTransition();
-
   const { update } = useSession();
 
   const onLoginSubmit = async (data: LoginFormDataType) => {
-    startTransition(async () => {
-      try {
-        await login(data);
-        await update();
-        toast.success("You logged in successfully");
-        setIsOpen(false);
-      } catch (e) {
-        if (e instanceof Error) {
-          if (e.message === "No such user") {
-            form.setError("email", { message: e.message });
-          } else if (e.message === "Wrong password") {
-            form.setError("password", { message: e.message });
-          } else {
-            toast.error("Something went wrong");
-            form.setError("root", { message: e.message });
-          }
+    try {
+      await login(data);
+      await update();
+      toast.success("You logged in successfully");
+      setIsOpen(false);
+    } catch (e) {
+      if (e instanceof Error) {
+        if (e.message === "No such user") {
+          form.setError("email", { message: e.message });
+        } else if (e.message === "Wrong password") {
+          form.setError("password", { message: e.message });
+        } else {
+          toast.error("Something went wrong");
+          form.setError("root", { message: e.message });
         }
       }
-    });
+    }
   };
   return (
     <Form {...form}>
       <form
-        className="space-y-8 px-2 pb-80"
+        className="space-y-8 px-2 pb-80 overflow-auto"
         onSubmit={form.handleSubmit(onLoginSubmit)}
       >
         {form.formState.errors.root && (
-          <div className="text-red-500">
+          <div className="text-destructive">
             {form.formState.errors.root.message}
           </div>
         )}
@@ -90,7 +86,11 @@ export function LoginForm({
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input
+                  {...field}
+                  autoFocus
+                  disabled={form.formState.isSubmitting}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,14 +104,22 @@ export function LoginForm({
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input {...field} type="password" />
+                <Input
+                  {...field}
+                  type="password"
+                  disabled={form.formState.isSubmitting}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? "Logging in..." : "Login"}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={form.formState.isSubmitting || !form.formState.isValid}
+        >
+          {form.formState.isSubmitting ? "Logging in..." : "Login"}
         </Button>
 
         <Button
@@ -119,12 +127,17 @@ export function LoginForm({
           variant="formLink"
           className="!flex !mx-auto underline"
           onClick={() => setFormType("forgot")}
+          disabled={form.formState.isSubmitting}
         >
           Forgot password?
         </Button>
         <div className="text-center">
           No account yet?{" "}
-          <Button variant="formLink" onClick={() => setFormType("register")}>
+          <Button
+            variant="formLink"
+            onClick={() => setFormType("register")}
+            disabled={form.formState.isSubmitting}
+          >
             Register
           </Button>
         </div>
@@ -133,6 +146,7 @@ export function LoginForm({
           onClick={() => signIn("google")}
           variant={"default"}
           className="flex mx-auto"
+          disabled={form.formState.isSubmitting}
         >
           Login via google
         </Button>

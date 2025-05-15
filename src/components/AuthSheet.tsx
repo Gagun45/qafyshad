@@ -3,7 +3,6 @@ import { LoginForm } from "./LoginForm";
 import { SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
 import { RegisterForm } from "./RegisterForm";
 import { ForgotForm } from "./ForgotForm";
-import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
 
 export default function AuthSheet({
@@ -29,15 +28,13 @@ export default function AuthSheet({
         </SheetTitle>
       </SheetHeader>
       <Separator />
-      <ScrollArea className="overflow-auto flex-1">
-        {formType === "login" ? (
-          <LoginForm setFormType={setFormType} setIsOpen={setIsOpen} />
-        ) : formType === "register" ? (
-          <RegisterForm setFormType={setFormType} />
-        ) : formType === "forgot" ? (
-          <ForgotForm setFormType={setFormType} setIsOpen={setIsOpen} />
-        ) : null}
-      </ScrollArea>
+      {formType === "login" ? (
+        <LoginForm setFormType={setFormType} setIsOpen={setIsOpen} />
+      ) : formType === "register" ? (
+        <RegisterForm setFormType={setFormType} />
+      ) : formType === "forgot" ? (
+        <ForgotForm setFormType={setFormType} setIsOpen={setIsOpen} />
+      ) : null}
     </SheetContent>
   );
 }

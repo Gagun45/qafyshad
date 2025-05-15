@@ -26,6 +26,14 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    name: {
+      type: String,
+      default: null,
+    },
+    contact: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );

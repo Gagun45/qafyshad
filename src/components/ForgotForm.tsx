@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
 import { forgot } from "@/lib/actions";
-import { useTransition, type Dispatch, type SetStateAction } from "react";
+import { type Dispatch, type SetStateAction } from "react";
 import { toast } from "sonner";
 
 const formSchema = z.object({
@@ -30,24 +30,22 @@ export function ForgotForm({
   setFormType: Dispatch<SetStateAction<"login" | "register" | "forgot">>;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 }) {
-  const [isPending, startTransition] = useTransition();
   const onForgotSubmit = async (data: { email: string }) => {
-    startTransition(async () => {
-      try {
-        await forgot(data.email);
-        toast.success(`Link successfully sent to ${data.email}`);
-        setIsOpen(false);
-      } catch (e) {
-        if (e instanceof Error) {
-          if (e.message === "No such user") {
-            form.setError("email", { message: e.message });
-          } else {
-            toast.error("Something went wrong");
-            form.setError("root", { message: e.message });
-          }
+    try {
+      await forgot(data.email);
+      toast.success(`Link successfully sent to ${data.email}`);
+      setIsOpen(false);
+      setFormType("login");
+    } catch (e) {
+      if (e instanceof Error) {
+        if (e.message === "No such user") {
+          form.setError("email", { message: e.message });
+        } else {
+          toast.error("Something went wrong");
+          form.setError("root", { message: e.message });
         }
       }
-    });
+    }
   };
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,11 +57,11 @@ export function ForgotForm({
   return (
     <Form {...form}>
       <form
-        className="space-y-8 px-2 pb-80"
+        className="space-y-8 px-2 pb-80 overflow-auto"
         onSubmit={form.handleSubmit(onForgotSubmit)}
       >
         {form.formState.errors.root && (
-          <div className="text-red-500">
+          <div className="text-destructive">
             {form.formState.errors.root.message}
           </div>
         )}
@@ -75,15 +73,23 @@ export function ForgotForm({
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input
+                  {...field}
+                  autoFocus
+                  disabled={form.formState.isSubmitting}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" disabled={isPending} className="w-full">
-          {isPending ? "Sending..." : "Send"}
+        <Button
+          type="submit"
+          disabled={form.formState.isSubmitting || !form.formState.isValid}
+          className="w-full"
+        >
+          {form.formState.isSubmitting ? "Sending..." : "Send"}
         </Button>
 
         <div className="text-center">
@@ -92,6 +98,7 @@ export function ForgotForm({
             type="button"
             variant={"formLink"}
             onClick={() => setFormType("login")}
+            disabled={form.formState.isSubmitting}
           >
             Login
           </Button>
@@ -100,7 +107,7 @@ export function ForgotForm({
           type="button"
           onClick={() => signIn("google")}
           variant={"default"}
-          disabled={isPending}
+          disabled={form.formState.isSubmitting}
           className="flex mx-auto"
         >
           Login via google

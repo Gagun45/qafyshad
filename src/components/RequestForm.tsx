@@ -15,13 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  useEffect,
-  useRef,
-  useState,
-  useTransition,
-  type ChangeEvent,
-} from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { AlertCircleIcon, Trash2Icon, XIcon, ZoomInIcon } from "lucide-react";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
@@ -104,7 +98,9 @@ export function RequestForm() {
     return (
       <AlertDialog open={alertIsOpen} onOpenChange={setAlertIsOpen}>
         <AlertDialogContent
-          className={isPending ? "cursor-wait pointer-events-none" : ""}
+          className={
+            form.formState.isSubmitting ? "cursor-wait pointer-events-none" : ""
+          }
         >
           <AlertDialogHeader>
             <AlertDialogTitle>Sendind the request</AlertDialogTitle>
@@ -115,8 +111,8 @@ export function RequestForm() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              disabled={isPending}
-              className={isPending ? "!cursor-wait" : ""}
+              disabled={form.formState.isSubmitting}
+              className={form.formState.isSubmitting ? "!cursor-wait" : ""}
             >
               Back
             </AlertDialogCancel>
@@ -124,9 +120,9 @@ export function RequestForm() {
               <Button
                 type="button"
                 onClick={form.handleSubmit(onResetSubmit)}
-                disabled={isPending || overallSize > 10}
+                disabled={form.formState.isSubmitting || overallSize > 10}
               >
-                {isPending ? "Sending..." : "Send"}
+                {form.formState.isSubmitting ? "Sending..." : "Send"}
               </Button>
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -154,6 +150,7 @@ export function RequestForm() {
                   type="button"
                   onClick={() => form.resetField(item.field)}
                   hidden={form.getValues(item.field).length == 0}
+                  disabled={form.formState.isSubmitting}
                 >
                   <XIcon className="group-hover:scale-[1.3] duration-150 transition-all" />
                 </Button>
@@ -177,7 +174,11 @@ export function RequestForm() {
               {"Choose device type" + ":"}
             </FormLabel>
             <div className="flex gap-2 items-center">
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={form.formState.isSubmitting}
+              >
                 <FormControl>
                   <SelectTrigger className="w-48">
                     <SelectValue placeholder="Choose" />
@@ -266,6 +267,7 @@ export function RequestForm() {
               variant={"secondary"}
               onClick={buttonClick}
               className="w-fit"
+              disabled={form.formState.isSubmitting}
             >
               Attach images
             </Button>
@@ -403,7 +405,6 @@ export function RequestForm() {
   });
   const isMobile = useIsMobile();
   const imageRef = useRef<HTMLInputElement>(null);
-  const [isPending, startTransition] = useTransition();
   const [attached, setAttached] = useState<AttachmentType[]>([]);
   const [zoomed, setZoomed] = useState<AttachmentType | null>();
   const [overallSize, setOverallSize] = useState(0);
@@ -472,19 +473,17 @@ export function RequestForm() {
   }, [attached]);
 
   const onResetSubmit = async (data: RequestDataType) => {
-    startTransition(async () => {
-      try {
-        await request(data);
-        toast.success("Request has been submitted!");
-        form.reset();
-        setAttached([]);
-      } catch {
-        toast.error('Something went wrong')
-        form.setError("root", { message: "Something went wrong" });
-      } finally {
-        setAlertIsOpen(false);
-      }
-    });
+    try {
+      await request(data);
+      toast.success("Request has been submitted!");
+      form.reset();
+      setAttached([]);
+    } catch {
+      toast.error("Something went wrong");
+      form.setError("root", { message: "Something went wrong" });
+    } finally {
+      setAlertIsOpen(false);
+    }
   };
 
   const handleDialogTriggerClick = async () => {
@@ -501,7 +500,7 @@ export function RequestForm() {
         onSubmit={form.handleSubmit(onResetSubmit)}
       >
         {form.formState.errors.root && (
-          <div className="text-red-500">
+          <div className="text-destructive">
             {form.formState.errors.root.message}
           </div>
         )}
@@ -514,11 +513,11 @@ export function RequestForm() {
         {attached.length > 0 && JSXAttachedImages()}
         <Button
           type="button"
-          disabled={isPending || overallSize > 10}
+          disabled={form.formState.isSubmitting || overallSize > 10}
           className="w-full"
           onClick={handleDialogTriggerClick}
         >
-          {isPending ? "Sending..." : "Send"}
+          {form.formState.isSubmitting ? "Sending..." : "Send"}
         </Button>
         {JSXSendAlertDialog()}
       </form>

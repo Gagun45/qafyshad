@@ -30,7 +30,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.isAadmin = user.isAdmin;
         token.email = user.email;
       }
       return token;
@@ -45,6 +44,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         user: {
           email: dbUser.email,
           isAdmin: dbUser.isAdmin,
+          name: dbUser.name,
+          contact: dbUser.contact,
         },
       };
       return filteredSession;
@@ -58,6 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           await User.create({
             email: user.email,
             password,
+            name: user.name,
           });
         }
         return true;
