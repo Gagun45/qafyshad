@@ -20,6 +20,7 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        formLink: "text-primary underline-offset-2 text-base font-bold underline !p-0 !h-auto",
         clearInput:
           "absolute right-2 !h-auto bottom-1/2 translate-y-1/2 !bg-transparent !p-0 group",
       },

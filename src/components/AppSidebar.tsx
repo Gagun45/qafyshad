@@ -32,6 +32,7 @@ import {
 import Auth from "./Auth";
 import Profile from "./Profile";
 import { useSession } from "next-auth/react";
+import { Separator } from "./ui/separator";
 
 const items = [
   { title: "Home", url: "/", icon: Home },
@@ -125,6 +126,7 @@ export default function AppSidebar() {
           </SidebarGroup>
         </SidebarContent>
 
+        <Separator />
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem className="space-y-2">

@@ -6,6 +6,7 @@ import { Separator } from "./ui/separator";
 import { SidebarMenuButton, useSidebar } from "./ui/sidebar";
 import { UserCircleIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import EditSheet from "./EditSheet";
 
 export default function Profile() {
   const { isMobile, state } = useSidebar();
@@ -24,7 +25,11 @@ export default function Profile() {
           </PopoverTrigger>
         </TooltipTrigger>
         {session && (
-          <PopoverContent className="w-fit flex flex-col gap-2" side="top" align="start">
+          <PopoverContent
+            className="w-fit flex flex-col gap-2"
+            side="top"
+            align="start"
+          >
             <div>
               <span>Email: {session?.user.email}</span>
               <Separator />
@@ -33,6 +38,9 @@ export default function Profile() {
             <div>
               <span>Role: {session?.user.isAdmin ? "Admin" : "User"}</span>
               <Separator />
+            </div>
+            <div>
+              <EditSheet/>
             </div>
           </PopoverContent>
         )}

@@ -54,7 +54,7 @@ export function RegisterForm({
           if (e.message === "Email already taken") {
             form.setError("email", { message: e.message });
           } else {
-            toast.error('Something went wrong')
+            toast.error("Something went wrong");
             form.setError("root", { message: e.message });
           }
         }
@@ -72,77 +72,80 @@ export function RegisterForm({
   });
   return (
     <Form {...form}>
-      <form
-        className="space-y-8"
-        onSubmit={form.handleSubmit(onRegisterSubmit)}
-      >
-        {form.formState.errors.root && (
-          <div className="text-red-500">
-            {form.formState.errors.root.message}
-          </div>
-        )}
-
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input {...field} type="password" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="passwordConfirm"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password repeat</FormLabel>
-              <FormControl>
-                <Input {...field} type="password" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" disabled={isPending} className="w-full">
-          {isPending ? "Registering..." : "Register"}
-        </Button>
-      </form>
-      <div>
-        Already have an account?{" "}
-        <button
-          className="underline-offset-1 underline cursor-pointer font-bold"
-          onClick={() => setFormType("login")}
+        <form
+          className="space-y-8 px-2 pb-80"
+          onSubmit={form.handleSubmit(onRegisterSubmit)}
         >
-          Login
-        </button>
-      </div>
-      <Button
-        onClick={() => signIn("google")}
-        variant={"default"}
-        className="text-background"
-      >
-        Login via google
-      </Button>
+          {form.formState.errors.root && (
+            <div className="text-red-500">
+              {form.formState.errors.root.message}
+            </div>
+          )}
+
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="passwordConfirm"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password repeat</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? "Registering..." : "Register"}
+          </Button>
+
+          <div className="text-center">
+            Already have an account?{" "}
+            <Button
+              type="button"
+              variant={"formLink"}
+              onClick={() => setFormType("login")}
+            >
+              Login
+            </Button>
+          </div>
+          <Button
+            type="button"
+            onClick={() => signIn("google")}
+            variant={"default"}
+            className="flex mx-auto"  
+          >
+            Login via google
+          </Button>
+        </form>
     </Form>
   );
 }

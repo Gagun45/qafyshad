@@ -19,6 +19,7 @@ import {
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface ContactInterface {
   label: string;
@@ -114,9 +115,11 @@ export default function Contacts() {
           <div className="flex items-center gap-2">
             <Badge className="text-base">qafy42@gmail.com</Badge>
             <Tooltip>
-              <TooltipTrigger className="cursor-pointer">
+              <TooltipTrigger className="cursor-pointer" asChild>
                 {isNaviAvailable && (
-                  <CopyIcon
+                  <Button
+                    variant={"ghost"}
+                    size={"icon"}
                     onClick={async () => {
                       try {
                         await navigator.clipboard.writeText("qafy42@gmail.com");
@@ -125,8 +128,9 @@ export default function Contacts() {
                         toast.error("Failed to copy", { duration: 1000 });
                       }
                     }}
-                    size={16}
-                  />
+                  >
+                    <CopyIcon className="!size-5" />
+                  </Button>
                 )}
               </TooltipTrigger>
               <TooltipContent>Copy</TooltipContent>

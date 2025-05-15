@@ -42,7 +42,7 @@ export function ForgotForm({
           if (e.message === "No such user") {
             form.setError("email", { message: e.message });
           } else {
-            toast.error('Something went wrong')
+            toast.error("Something went wrong");
             form.setError("root", { message: e.message });
           }
         }
@@ -58,7 +58,10 @@ export function ForgotForm({
   });
   return (
     <Form {...form}>
-      <form className="space-y-8" onSubmit={form.handleSubmit(onForgotSubmit)}>
+      <form
+        className="space-y-8 px-2 pb-80"
+        onSubmit={form.handleSubmit(onForgotSubmit)}
+      >
         {form.formState.errors.root && (
           <div className="text-red-500">
             {form.formState.errors.root.message}
@@ -82,24 +85,27 @@ export function ForgotForm({
         <Button type="submit" disabled={isPending} className="w-full">
           {isPending ? "Sending..." : "Send"}
         </Button>
-      </form>
-      <div>
-        Already have an account?{" "}
-        <button
-          className="underline-offset-1 underline cursor-pointer font-bold"
-          onClick={() => setFormType("login")}
+
+        <div className="text-center">
+          Already have an account?{" "}
+          <Button
+            type="button"
+            variant={"formLink"}
+            onClick={() => setFormType("login")}
+          >
+            Login
+          </Button>
+        </div>
+        <Button
+          type="button"
+          onClick={() => signIn("google")}
+          variant={"default"}
+          disabled={isPending}
+          className="flex mx-auto"
         >
-          Login
-        </button>
-      </div>
-      <Button
-        onClick={() => signIn("google")}
-        variant={"default"}
-        className="text-background"
-        disabled={isPending}
-      >
-        Login via google
-      </Button>
+          Login via google
+        </Button>
+      </form>
     </Form>
   );
 }

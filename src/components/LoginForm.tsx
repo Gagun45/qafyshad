@@ -74,7 +74,10 @@ export function LoginForm({
   };
   return (
     <Form {...form}>
-      <form className="space-y-8" onSubmit={form.handleSubmit(onLoginSubmit)}>
+      <form
+        className="space-y-8 px-2 pb-80"
+        onSubmit={form.handleSubmit(onLoginSubmit)}
+      >
         {form.formState.errors.root && (
           <div className="text-red-500">
             {form.formState.errors.root.message}
@@ -110,25 +113,30 @@ export function LoginForm({
         <Button type="submit" className="w-full" disabled={isPending}>
           {isPending ? "Logging in..." : "Login"}
         </Button>
-      </form>
-      <button
-        className="underline-offset-1 underline cursor-pointer font-bold"
-        onClick={() => setFormType("forgot")}
-      >
-        Forgot password?
-      </button>
-      <div className="text-center">
-        No account yet?{" "}
-        <button
-          className="underline-offset-1 underline cursor-pointer font-bold"
-          onClick={() => setFormType("register")}
+
+        <Button
+          type="button"
+          variant="formLink"
+          className="!flex !mx-auto underline"
+          onClick={() => setFormType("forgot")}
         >
-          Register
-        </button>
-      </div>
-      <Button onClick={() => signIn("google")} variant={"default"}>
-        Login via google
-      </Button>
+          Forgot password?
+        </Button>
+        <div className="text-center">
+          No account yet?{" "}
+          <Button variant="formLink" onClick={() => setFormType("register")}>
+            Register
+          </Button>
+        </div>
+        <Button
+          type="button"
+          onClick={() => signIn("google")}
+          variant={"default"}
+          className="flex mx-auto"
+        >
+          Login via google
+        </Button>
+      </form>
     </Form>
   );
 }

@@ -1,13 +1,10 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { LoginForm } from "./LoginForm";
-import {
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "./ui/sheet";
+import { SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
 import { RegisterForm } from "./RegisterForm";
 import { ForgotForm } from "./ForgotForm";
+import { ScrollArea } from "./ui/scroll-area";
+import { Separator } from "./ui/separator";
 
 export default function AuthSheet({
   setIsOpen,
@@ -19,9 +16,9 @@ export default function AuthSheet({
   );
 
   return (
-    <SheetContent>
-      <SheetHeader className="space-y-4">
-        <SheetTitle className="text-2xl">
+    <SheetContent className="flex flex-col">
+      <SheetHeader>
+        <SheetTitle>
           {formType === "login"
             ? "Login"
             : formType === "register"
@@ -30,16 +27,17 @@ export default function AuthSheet({
             ? "Forgot password"
             : null}
         </SheetTitle>
-        <SheetDescription asChild>
-          {formType === "login" ? (
-            <LoginForm setFormType={setFormType} setIsOpen={setIsOpen} />
-          ) : formType === "register" ? (
-            <RegisterForm setFormType={setFormType} />
-          ) : formType === "forgot" ? (
-            <ForgotForm setFormType={setFormType} setIsOpen={setIsOpen}/>
-          ) : null}
-        </SheetDescription>
       </SheetHeader>
+      <Separator />
+      <ScrollArea className="overflow-auto flex-1">
+        {formType === "login" ? (
+          <LoginForm setFormType={setFormType} setIsOpen={setIsOpen} />
+        ) : formType === "register" ? (
+          <RegisterForm setFormType={setFormType} />
+        ) : formType === "forgot" ? (
+          <ForgotForm setFormType={setFormType} setIsOpen={setIsOpen} />
+        ) : null}
+      </ScrollArea>
     </SheetContent>
   );
 }
