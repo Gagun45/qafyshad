@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,6 +17,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+import { useEffect, type Dispatch, type SetStateAction } from "react";
+import { Redo2Icon } from "lucide-react";
 
 const formSchema = z.object({
   name: z
@@ -25,8 +28,13 @@ const formSchema = z.object({
   contact: z.string().max(80, "Password must be at most 80 characters long"),
 });
 
-export function EditProfileForm() {
+export function EditProfileForm({
+  setIsDirty,
+}: {
+  setIsDirty: Dispatch<SetStateAction<boolean>>;
+}) {
   const { data: session, update } = useSession();
+
   const onResetSubmit = async (data: { name: string; contact: string }) => {
     try {
       const res = await fetch("/api/profile/editProfile", {
@@ -39,7 +47,6 @@ export function EditProfileForm() {
         form.setError("root", { message: response.message });
         toast.error("Something went wrong");
       } else {
-        await update();
         toast.success(response.message);
       }
     } catch (e) {
@@ -47,6 +54,9 @@ export function EditProfileForm() {
       if (e instanceof Error) {
         form.setError("root", { message: e.message });
       }
+    } finally {
+      await update();
+      setIsDirty(false);
     }
   };
   const form = useForm<z.infer<typeof formSchema>>({
@@ -60,6 +70,14 @@ export function EditProfileForm() {
   const handleCancel = () => {
     form.reset();
   };
+  useEffect(() => {
+    if (session?.user) {
+      form.reset({ name: session.user.name, contact: session.user.contact });
+    }
+  }, [session?.user, form.reset]);
+  useEffect(() => {
+    setIsDirty(form.formState.isDirty);
+  }, [form.formState]);
   return (
     <Form {...form}>
       <form
@@ -78,7 +96,19 @@ export function EditProfileForm() {
             <FormItem>
               <FormLabel>Your name</FormLabel>
               <FormControl>
-                <Input {...field} disabled={form.formState.isSubmitting} />
+                <div className="relative ">
+                  <Input
+                    {...field}
+                    placeholder={field.value ? field.value : "Enter your name"}
+                    disabled={form.formState.isSubmitting}
+                  />
+                  {form.formState.dirtyFields.name && (
+                    <Redo2Icon
+                      onClick={() => form.resetField("name")}
+                      className="absolute right-1 size-4 bottom-1/2 translate-y-1/2"
+                    />
+                  )}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,16 +119,34 @@ export function EditProfileForm() {
           control={form.control}
           name="contact"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="mb-2">
               <FormLabel>Contact Information</FormLabel>
               <FormControl>
-                <Input {...field} disabled={form.formState.isSubmitting} />
+                <div className="relative ">
+                  <Input
+                    {...field}
+                    disabled={form.formState.isSubmitting}
+                    placeholder={
+                      field.value ? field.value : "Enter your contact"
+                    }
+                  />
+                  {form.formState.dirtyFields.contact && (
+                    <Redo2Icon
+                      onClick={() => form.resetField("contact")}
+                      className="absolute right-1 size-4 bottom-1/2 translate-y-1/2"
+                    />
+                  )}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="flex gap-2">
+        <FormDescription>
+          This information will be used to autocomplete the request form
+        </FormDescription>
+
+        <div className="flex gap-2 flex-wrap">
           <Button
             onClick={handleCancel}
             type="button"
@@ -106,7 +154,7 @@ export function EditProfileForm() {
             className="flex-1"
             disabled={!form.formState.isDirty || form.formState.isSubmitting}
           >
-            Cancel
+            Reset
           </Button>
           <Button
             type="submit"
@@ -116,6 +164,9 @@ export function EditProfileForm() {
             {form.formState.isSubmitting ? "Applying..." : "Apply"}
           </Button>
         </div>
+        {form.formState.isDirty && (
+          <FormDescription>There are unsaved changes</FormDescription>
+        )}
       </form>
     </Form>
   );

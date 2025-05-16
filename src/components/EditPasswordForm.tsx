@@ -10,15 +10,15 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useEffect, type Dispatch, type SetStateAction } from "react";
 
 const formSchema = z
   .object({
-    oldPassword: z
+    currentPassword: z
       .string()
       .min(8, "Password must be at least 8 characters long")
       .max(24, "Password must be at most 24 characters long")
@@ -35,15 +35,19 @@ const formSchema = z
         "Password can only contain letters, digits and !@#$%^&*()_+-="
       ),
   })
-  .refine((data) => data.oldPassword !== data.password, {
+  .refine((data) => data.currentPassword !== data.password, {
     message: "Passwords must differ",
     path: ["password"],
   });
 
-export function EditPasswordForm() {
+export function EditPasswordForm({
+  setIsDirty,
+}: {
+  setIsDirty: Dispatch<SetStateAction<boolean>>;
+}) {
   const onResetSubmit = async (data: {
     password: string;
-    oldPassword: string;
+    currentPassword: string;
   }) => {
     try {
       const res = await fetch("/api/profile/editPassword", {
@@ -64,16 +68,21 @@ export function EditPasswordForm() {
       if (e instanceof Error) {
         form.setError("root", { message: e.message });
       }
+    } finally {
+      setIsDirty(false);
     }
   };
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      oldPassword: "",
+      currentPassword: "",
       password: "",
     },
     mode: "onChange",
   });
+  useEffect(() => {
+    setIsDirty(form.formState.isDirty);
+  }, [form.formState]);
   return (
     <Form {...form}>
       <form
@@ -87,15 +96,15 @@ export function EditPasswordForm() {
         )}
         <FormField
           control={form.control}
-          name="oldPassword"
+          name="currentPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Old password</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   type="password"
                   disabled={form.formState.isSubmitting}
+                  placeholder="Current password"
                 />
               </FormControl>
               <FormMessage />
@@ -108,19 +117,19 @@ export function EditPasswordForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>New password</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   type="password"
                   disabled={form.formState.isSubmitting}
+                  placeholder="New password"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button
             type="button"
             variant={"secondary"}

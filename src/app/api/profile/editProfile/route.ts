@@ -20,12 +20,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    if (name) {
-      user.name = name;
-    }
-    if (contact) {
-      user.contact = contact;
-    }
+    user.name = name;
+    user.contact = contact;
 
     await user.save();
 
