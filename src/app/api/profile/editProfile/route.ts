@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { dbConnect } from "@/lib/dbconnect";
-import { User } from "@/lib/models";
+import { getUserById } from "@/lib/actions";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     await dbConnect();
 
-    const user = await User.findOne({ email: session.user.email });
+    const user = await getUserById(session.user.id);
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }

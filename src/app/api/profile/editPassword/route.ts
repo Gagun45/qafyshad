@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { dbConnect } from "@/lib/dbconnect";
-import { User } from "@/lib/models";
+import { getUserById } from "@/lib/actions";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,15 +11,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { password, oldPassword } = await req.json();
+    const { password, currentPassword } = await req.json();
 
     await dbConnect();
 
-    const user = await User.findOne({ email: session.user.email });
+    const user = await getUserById(session.user.id);
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
-    if (oldPassword !== user.password) {
+    if (currentPassword !== user.password) {
       return NextResponse.json(
         { message: "Wrong old password" },
         { status: 404 }

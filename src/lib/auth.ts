@@ -38,7 +38,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.sub = dbUser._id.toString();
         }
       }
-      console.log("Token: ", token);
       return token;
     },
     async session({ session, token }) {
@@ -57,7 +56,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           contact: dbUser.contact,
         },
       };
-      console.log("Session: ", filteredSession);
       return filteredSession;
     },
     async signIn({ user }) {
