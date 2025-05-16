@@ -29,7 +29,15 @@ export default function EditSheet() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="mr-auto">Back</AlertDialogCancel>
+            <AlertDialogCancel
+              className="mr-auto"
+              onClick={() => {
+                setPendingTab("");
+                setShowDialog(false);
+              }}
+            >
+              Back
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (pendingTab) {

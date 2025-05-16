@@ -62,8 +62,8 @@ export function EditProfileForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: session?.user.name || "",
-      contact: session?.user.contact || "",
+      name: session?.user.name ?? "",
+      contact: session?.user.contact ?? "",
     },
     mode: "onChange",
   });

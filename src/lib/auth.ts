@@ -3,6 +3,7 @@ import Google from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { dbConnect } from "./dbconnect";
 import { User } from "./models";
+import { Types } from "mongoose";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -11,11 +12,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         try {
           await dbConnect();
-          const user = await User.findOne({ email: credentials.email });
+          const user = await User.findOne({
+            email: credentials.email,
+            password: credentials.password,
+          });
 
           return {
             email: user.email,
-            isAdmin: user.isAdmin,
           };
         } catch {
           console.log("Authorize error");
@@ -30,33 +33,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.email = user.email;
+        const dbUser = await User.findOne({ email: user.email });
+        if (dbUser) {
+          token.sub = dbUser._id.toString();
+        }
       }
+      console.log("Token: ", token);
       return token;
     },
-    async session({ session }) {
+    async session({ session, token }) {
       await dbConnect();
-
-      const dbUser = await User.findOne({ email: session.user.email });
+      const dbUser = await User.findOne({
+        _id: new Types.ObjectId(token.sub as string),
+      });
 
       const filteredSession = {
         ...session,
         user: {
+          id: dbUser.id,
           email: dbUser.email,
           isAdmin: dbUser.isAdmin,
           name: dbUser.name,
           contact: dbUser.contact,
         },
       };
+      console.log("Session: ", filteredSession);
       return filteredSession;
     },
     async signIn({ user }) {
       try {
         await dbConnect();
-        const existingUser = await User.findOne({ email: user.email });
+        let existingUser = await User.findOne({ email: user.email });
         if (!existingUser) {
           const password = crypto.randomUUID().slice(0, 8).toUpperCase();
-          await User.create({
+          existingUser = await User.create({
             email: user.email,
             password,
             name: user.name,
