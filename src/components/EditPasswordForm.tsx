@@ -82,7 +82,7 @@ export function EditPasswordForm({
   });
   useEffect(() => {
     setIsDirty(form.formState.isDirty);
-  }, [form.formState]);
+  }, [form.formState, setIsDirty]);
   return (
     <Form {...form}>
       <form
@@ -94,6 +94,7 @@ export function EditPasswordForm({
             {form.formState.errors.root.message}
           </div>
         )}
+        <h2 className="text-center font-bold text-lg">Change password</h2>
         <FormField
           control={form.control}
           name="currentPassword"

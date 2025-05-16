@@ -6,7 +6,6 @@ import { dbConnect } from "./dbconnect";
 import { User } from "./models";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
-import { Types } from "mongoose";
 
 // const BODY_SIZE_LIMIT = "10mb"; // NEXT.CONFIG.TS value !!! //
 
@@ -39,7 +38,7 @@ export type AttachmentType = {
 export type RequestDataType = {
   name: string;
   contact: string;
-  device: string;
+  device?: string;
   images?: AttachmentType[];
 };
 
@@ -192,22 +191,12 @@ export const request = async (data: RequestDataType) => {
     Information:<br/>
     Name: ${name}<br/>
     Contact: ${contact}<br/>
-    Device: ${device}<br/>
+    Device: ${device ?? "Not specified"}<br/>
     ----------------------------<br/>
     `;
     const attachments = images?.map((image) => image.file);
     await sendEmail(WORK_EMAIL, subject, html, attachments);
   } catch {
     throw new Error("Something went wrong");
-  }
-};
-
-export const getUserById = async (id: string) => {
-  try {
-    await dbConnect();
-    const user = await User.findById(new Types.ObjectId(id));
-    return user;
-  } catch {
-    return null;
   }
 };

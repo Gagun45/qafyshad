@@ -46,11 +46,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
+import { useSession } from "next-auth/react";
 
 const formSchema = z.object({
   name: z.string().min(1, "Fill in please").max(40),
   contact: z.string().min(1, "Fill in please").max(40),
-  device: z.string().max(40),
+  device: z.string().optional(),
   description: z.string().min(1, "Provide some information please"),
   images: z.any(),
 });
@@ -67,10 +68,7 @@ const DEVICE_TYPES: DeviceInterface[] = [
   { value: "other", label: "Other" },
 ];
 
-type TextFieldKeys = Extract<
-  keyof typeof formSchema.shape,
-  "name" | "contact" | "device"
->;
+type TextFieldKeys = Extract<keyof typeof formSchema.shape, "name" | "contact">;
 interface FieldInterface {
   field: TextFieldKeys;
   label: string;
@@ -94,6 +92,7 @@ const fields: FieldInterface[] = [
 ];
 
 export function RequestForm() {
+  const { data: session } = useSession();
   const JSXSendAlertDialog = () => {
     return (
       <AlertDialog open={alertIsOpen} onOpenChange={setAlertIsOpen}>
@@ -105,25 +104,24 @@ export function RequestForm() {
           <AlertDialogHeader>
             <AlertDialogTitle>Sendind the request</AlertDialogTitle>
             <AlertDialogDescription>
-              Make sure that you have provided proper contact information. We
-              will use the information to reach you
+              <span>
+                Make sure that you have provided proper contact information. We
+                will use the information to reach you:
+              </span>
+              <br />
+              <br />
+              <span className="font-bold">{form.getValues("contact")}</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel
-              disabled={form.formState.isSubmitting}
-              className={form.formState.isSubmitting ? "!cursor-wait" : ""}
-            >
+            <AlertDialogCancel disabled={form.formState.isSubmitting}>
               Back
             </AlertDialogCancel>
-            <AlertDialogAction asChild>
-              <Button
-                type="button"
-                onClick={form.handleSubmit(onResetSubmit)}
-                disabled={form.formState.isSubmitting || overallSize > 10}
-              >
-                {form.formState.isSubmitting ? "Sending..." : "Send"}
-              </Button>
+            <AlertDialogAction
+              onClick={form.handleSubmit(onResetSubmit)}
+              disabled={form.formState.isSubmitting || overallSize > 10}
+            >
+              {form.formState.isSubmitting ? "Sending..." : "Send"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -148,8 +146,8 @@ export function RequestForm() {
                 <Button
                   variant={"clearInput"}
                   type="button"
-                  onClick={() => form.resetField(item.field)}
-                  hidden={form.getValues(item.field).length == 0}
+                  onClick={() => form.setValue(item.field, "")}
+                  hidden={!form.getValues(item.field)}
                   disabled={form.formState.isSubmitting}
                 >
                   <XIcon className="group-hover:scale-[1.3] duration-150 transition-all" />
@@ -173,45 +171,47 @@ export function RequestForm() {
             <FormLabel className="mb-2 gap-1">
               {"Choose device type" + ":"}
             </FormLabel>
-            <div className="flex gap-2 items-center">
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                disabled={form.formState.isSubmitting}
-              >
-                <FormControl>
+            <FormControl>
+              <div className="flex gap-2 items-center">
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={form.formState.isSubmitting}
+                >
                   <SelectTrigger className="w-48">
                     <SelectValue placeholder="Choose" />
                   </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {DEVICE_TYPES.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Popover open={popoverIsOpen} onOpenChange={setPopoverIsOpen}>
-                <PopoverTrigger asChild>
-                  <AlertCircleIcon
-                    className="size-5 text-chart-2"
+
+                  <SelectContent>
+                    {DEVICE_TYPES.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Popover open={popoverIsOpen} onOpenChange={setPopoverIsOpen}>
+                  <PopoverTrigger asChild>
+                    <AlertCircleIcon
+                      className="size-5 text-chart-2"
+                      onMouseEnter={() => setPopoverIsOpen(true)}
+                      onMouseLeave={() => setPopoverIsOpen(false)}
+                    />
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="text-sm !p-2"
+                    side={isMobile ? "bottom" : "right"}
                     onMouseEnter={() => setPopoverIsOpen(true)}
                     onMouseLeave={() => setPopoverIsOpen(false)}
-                  />
-                </PopoverTrigger>
-                <PopoverContent
-                  className="text-sm !p-2"
-                  side={isMobile ? "bottom" : "right"}
-                  onMouseEnter={() => setPopoverIsOpen(true)}
-                  onMouseLeave={() => setPopoverIsOpen(false)}
-                  onClick={() => setPopoverIsOpen(false)}
-                >
-                  This field is optional. You can leave it empty or choose
-                  &lsquo;Other&lsquo; if not sure
-                </PopoverContent>
-              </Popover>
-            </div>
+                    onClick={() => setPopoverIsOpen(false)}
+                  >
+                    This field is optional. You can leave it empty or choose
+                    &lsquo;Other&lsquo; if not sure
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </FormControl>
             <FormDescription>
               Select type device or leave empty if not sure
             </FormDescription>
@@ -403,6 +403,12 @@ export function RequestForm() {
     },
     mode: "onChange",
   });
+
+  useEffect(() => {
+    if (session?.user) {
+      form.reset({ name: session?.user.name, contact: session?.user.contact });
+    }
+  }, [session?.user]);
   const isMobile = useIsMobile();
   const imageRef = useRef<HTMLInputElement>(null);
   const [attached, setAttached] = useState<AttachmentType[]>([]);

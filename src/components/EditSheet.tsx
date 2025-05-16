@@ -30,7 +30,6 @@ export default function EditSheet() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className="mr-auto"
               onClick={() => {
                 setPendingTab("");
                 setShowDialog(false);
@@ -83,6 +82,7 @@ export default function EditSheet() {
   };
   return (
     <Sheet open={sheetIsOpen} onOpenChange={onSheetClose}>
+      {showDialog && changesDialog()}
       <SheetTrigger asChild>
         <Button>Edit Profile</Button>
       </SheetTrigger>
@@ -110,7 +110,6 @@ export default function EditSheet() {
           </TabsContent>
         </Tabs>
       </SheetContent>
-      {showDialog && changesDialog()}
     </Sheet>
   );
 }

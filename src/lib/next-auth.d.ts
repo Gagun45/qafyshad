@@ -1,13 +1,19 @@
-import type { AdapterSession } from "next-auth/adapters";
-
 declare module "next-auth" {
-  interface Session extends AdapterSession {
+  interface Session {
     user: {
-      id: string;
       email: string;
       isAdmin: boolean;
       name: string;
       contact: string;
     };
   }
+}
+export interface ServerSession {
+  user: {
+    id: string;
+    email: string;
+    isAdmin: boolean;
+    name: string;
+    contact: string;
+  };
 }

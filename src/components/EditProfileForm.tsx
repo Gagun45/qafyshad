@@ -62,8 +62,8 @@ export function EditProfileForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: session?.user.name ?? "",
-      contact: session?.user.contact ?? "",
+      name: "",
+      contact: "",
     },
     mode: "onChange",
   });
@@ -74,10 +74,10 @@ export function EditProfileForm({
     if (session?.user) {
       form.reset({ name: session.user.name, contact: session.user.contact });
     }
-  }, [session?.user, form.reset]);
+  }, [session?.user, form.reset, form]);
   useEffect(() => {
     setIsDirty(form.formState.isDirty);
-  }, [form.formState]);
+  }, [form.formState, setIsDirty]);
   return (
     <Form {...form}>
       <form
@@ -98,15 +98,20 @@ export function EditProfileForm({
               <FormControl>
                 <div className="relative ">
                   <Input
+                    autoFocus
                     {...field}
                     placeholder={field.value ? field.value : "Enter your name"}
                     disabled={form.formState.isSubmitting}
                   />
                   {form.formState.dirtyFields.name && (
-                    <Redo2Icon
+                    <Button
+                      variant={"clearInput"}
+                      type="button"
                       onClick={() => form.resetField("name")}
-                      className="absolute right-1 size-4 bottom-1/2 translate-y-1/2"
-                    />
+                      disabled={form.formState.isSubmitting}
+                    >
+                      <Redo2Icon className="group-hover:scale-[1.3] duration-150 transition-all" />
+                    </Button>
                   )}
                 </div>
               </FormControl>
@@ -122,7 +127,7 @@ export function EditProfileForm({
             <FormItem className="mb-2">
               <FormLabel>Contact Information</FormLabel>
               <FormControl>
-                <div className="relative ">
+                <div className="relative">
                   <Input
                     {...field}
                     disabled={form.formState.isSubmitting}
@@ -131,10 +136,14 @@ export function EditProfileForm({
                     }
                   />
                   {form.formState.dirtyFields.contact && (
-                    <Redo2Icon
+                    <Button
+                      variant={"clearInput"}
+                      type="button"
                       onClick={() => form.resetField("contact")}
-                      className="absolute right-1 size-4 bottom-1/2 translate-y-1/2"
-                    />
+                      disabled={form.formState.isSubmitting}
+                    >
+                      <Redo2Icon className="group-hover:scale-[1.3] duration-150 transition-all" />
+                    </Button>
                   )}
                 </div>
               </FormControl>
