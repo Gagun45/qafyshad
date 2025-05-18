@@ -19,11 +19,6 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { AlertCircleIcon, Trash2Icon, XIcon, ZoomInIcon } from "lucide-react";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
-import {
-  request,
-  type AttachmentType,
-  type RequestDataType,
-} from "@/lib/actions";
 import { toast } from "sonner";
 import {
   Select,
@@ -47,6 +42,9 @@ import {
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
 import { useSession } from "next-auth/react";
+import type { AttachmentType, RequestDataType } from "@/lib/types";
+import { request } from "@/lib/actions/request";
+import { RequestMessages, SMTH_WENT_WRONG } from "@/lib/errors";
 
 const formSchema = z.object({
   name: z.string().min(1, "Fill in please").max(40),
@@ -408,7 +406,7 @@ export function RequestForm() {
     if (session?.user) {
       form.reset({ name: session?.user.name, contact: session?.user.contact });
     }
-  }, [session?.user]);
+  }, [session?.user, form]);
   const isMobile = useIsMobile();
   const imageRef = useRef<HTMLInputElement>(null);
   const [attached, setAttached] = useState<AttachmentType[]>([]);
@@ -476,17 +474,23 @@ export function RequestForm() {
         0
       )
     );
-  }, [attached]);
+  }, [attached, form]);
 
   const onResetSubmit = async (data: RequestDataType) => {
     try {
-      await request(data);
-      toast.success("Request has been submitted!");
+      const result = await request(data);
+      if (!result.success) {
+        form.reset();
+        toast.error(SMTH_WENT_WRONG);
+        form.setError("root", { message: SMTH_WENT_WRONG });
+        return;
+      }
+      toast.success(RequestMessages.SUCCESS_REQUEST);
       form.reset();
       setAttached([]);
     } catch {
-      toast.error("Something went wrong");
-      form.setError("root", { message: "Something went wrong" });
+      toast.error(SMTH_WENT_WRONG);
+      form.setError("root", { message: SMTH_WENT_WRONG });
     } finally {
       setAlertIsOpen(false);
     }

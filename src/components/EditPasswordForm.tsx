@@ -15,6 +15,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useEffect, type Dispatch, type SetStateAction } from "react";
+import { useSession } from "next-auth/react";
+import { editPassword } from "@/lib/actions/editPassword";
+import { EditPasswordMessages, SMTH_WENT_WRONG } from "@/lib/errors";
 
 const formSchema = z
   .object({
@@ -45,29 +48,28 @@ export function EditPasswordForm({
 }: {
   setIsDirty: Dispatch<SetStateAction<boolean>>;
 }) {
+  const { data: session } = useSession();
   const onResetSubmit = async (data: {
     password: string;
     currentPassword: string;
   }) => {
     try {
-      const res = await fetch("/api/profile/editPassword", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const response = await res.json();
+      const result = await editPassword(
+        data.currentPassword,
+        data.password,
+        session?.user.id
+      );
+      if (!result.success) {
+        form.reset();
+        form.setError("root", { message: result.message });
+        toast.error(SMTH_WENT_WRONG);
+        return;
+      }
       form.reset();
-      if (!res.ok) {
-        form.setError("root", { message: response.message });
-        toast.error("Something went wrong");
-      } else {
-        toast.success(response.message);
-      }
-    } catch (e) {
-      toast.error("Something went wrong");
-      if (e instanceof Error) {
-        form.setError("root", { message: e.message });
-      }
+      toast.success(EditPasswordMessages.SUCCESS_EDIT_PASSWORD);
+    } catch {
+      toast.error(SMTH_WENT_WRONG);
+      form.setError("root", { message: SMTH_WENT_WRONG });
     } finally {
       setIsDirty(false);
     }

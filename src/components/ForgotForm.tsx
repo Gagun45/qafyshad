@@ -15,9 +15,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
-import { forgot } from "@/lib/actions";
 import { type Dispatch, type SetStateAction } from "react";
 import { toast } from "sonner";
+import { forgot } from "@/lib/actions/forgot";
+import { SMTH_WENT_WRONG } from "@/lib/errors";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -32,19 +33,17 @@ export function ForgotForm({
 }) {
   const onForgotSubmit = async (data: { email: string }) => {
     try {
-      await forgot(data.email);
+      const result = await forgot(data.email);
+      if (!result.success) {
+        toast.error(SMTH_WENT_WRONG);
+        form.setError("root", { message: result.message });
+        return;
+      }
       toast.success(`Link successfully sent to ${data.email}`);
       setIsOpen(false);
       setFormType("login");
-    } catch (e) {
-      if (e instanceof Error) {
-        if (e.message === "No such user") {
-          form.setError("email", { message: e.message });
-        } else {
-          toast.error("Something went wrong");
-          form.setError("root", { message: e.message });
-        }
-      }
+    } catch {
+      form.setError("root", { message: SMTH_WENT_WRONG });
     }
   };
   const form = useForm<z.infer<typeof formSchema>>({

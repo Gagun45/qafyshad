@@ -1,6 +1,7 @@
 declare module "next-auth" {
   interface Session {
     user: {
+      id: string;
       email: string;
       isAdmin: boolean;
       name: string;
@@ -15,5 +16,6 @@ export interface ServerSession {
     isAdmin: boolean;
     name: string;
     contact: string;
+    serverField: string;
   };
 }

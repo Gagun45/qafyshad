@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    serverField: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );

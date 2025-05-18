@@ -14,10 +14,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { reset } from "@/lib/actions";
 
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { reset } from "@/lib/actions/reset";
+import { SMTH_WENT_WRONG } from "@/lib/errors";
 
 const formSchema = z.object({
   password: z
@@ -34,14 +35,16 @@ export function ResetForm({ token }: { token: string }) {
   const router = useRouter();
   const onResetSubmit = async (data: { password: string }) => {
     try {
-      await reset(data.password, token);
-      toast.success("New password successfully applied");
-      router.push("/");
-    } catch (e) {
-      toast.error("Something went wrong");
-      if (e instanceof Error) {
-        form.setError("root", { message: e.message });
+      const result = await reset(data.password, token);
+      if (!result.success) {
+        toast.error(SMTH_WENT_WRONG);
+        form.setError("root", { message: result.message });
+        return;
       }
+      toast.success(result.message);
+      router.push("/");
+    } catch {
+      form.setError("root", { message: SMTH_WENT_WRONG });
     }
   };
   const form = useForm<z.infer<typeof formSchema>>({
@@ -70,7 +73,11 @@ export function ResetForm({ token }: { token: string }) {
             <FormItem>
               <FormLabel>New password</FormLabel>
               <FormControl>
-                <Input {...field} type="password" disabled={form.formState.isSubmitting}/>
+                <Input
+                  {...field}
+                  type="password"
+                  disabled={form.formState.isSubmitting}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

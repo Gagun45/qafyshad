@@ -16,8 +16,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { signIn, useSession } from "next-auth/react";
 import { type Dispatch, type SetStateAction } from "react";
-import { login, type LoginFormDataType } from "@/lib/actions";
 import { toast } from "sonner";
+import type { LoginFormDataType } from "@/lib/types";
+import { login } from "@/lib/actions/login";
+import { SMTH_WENT_WRONG } from "@/lib/errors";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -51,21 +53,17 @@ export function LoginForm({
 
   const onLoginSubmit = async (data: LoginFormDataType) => {
     try {
-      await login(data);
-      await update();
-      toast.success("You logged in successfully");
-      setIsOpen(false);
-    } catch (e) {
-      if (e instanceof Error) {
-        if (e.message === "No such user") {
-          form.setError("email", { message: e.message });
-        } else if (e.message === "Wrong password") {
-          form.setError("password", { message: e.message });
-        } else {
-          toast.error("Something went wrong");
-          form.setError("root", { message: e.message });
-        }
+      const result = await login(data);
+      if (!result.success) {
+        toast.error(SMTH_WENT_WRONG);
+        form.setError("root", { message: result.message });
+        return;
       }
+      await update();
+      setIsOpen(false);
+      toast.success(result.message);
+    } catch {
+      form.setError("root", { message: SMTH_WENT_WRONG });
     }
   };
   return (

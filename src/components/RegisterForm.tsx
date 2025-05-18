@@ -15,9 +15,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
-import { register, type RegisterFormDataType } from "@/lib/actions";
 import { toast } from "sonner";
 import { type Dispatch, type SetStateAction } from "react";
+import { register } from "@/lib/actions/register";
+import type { RegisterFormDataType } from "@/lib/types";
+import { RegisterMessages, SMTH_WENT_WRONG } from "@/lib/errors";
 
 const formSchema = z
   .object({
@@ -44,20 +46,20 @@ export function RegisterForm({
 }) {
   const onRegisterSubmit = async (data: RegisterFormDataType) => {
     try {
-      await register(data);
-      toast.success("Successfully registered");
-      setFormType("login");
-    } catch (e) {
-      if (e instanceof Error) {
-        if (e.message === "Email already taken") {
-          form.setError("email", { message: e.message });
-        } else {
-          toast.error("Something went wrong");
-          form.setError("root", { message: e.message });
-        }
+      const result = await register(data);
+      if (!result.success) {
+        toast.error(SMTH_WENT_WRONG);
+        form.setError("root", { message: result.message });
+        return;
       }
+      toast.success(RegisterMessages.SUCCESS_REGISTER);
+      setFormType("login");
+    } catch {
+      toast.error(SMTH_WENT_WRONG);
+      form.setError("root", { message: SMTH_WENT_WRONG });
     }
   };
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -86,7 +88,11 @@ export function RegisterForm({
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input {...field} autoFocus disabled={form.formState.isSubmitting}/>
+                <Input
+                  {...field}
+                  autoFocus
+                  disabled={form.formState.isSubmitting}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -100,7 +106,11 @@ export function RegisterForm({
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input {...field} type="password" disabled={form.formState.isSubmitting}/>
+                <Input
+                  {...field}
+                  type="password"
+                  disabled={form.formState.isSubmitting}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -114,7 +124,11 @@ export function RegisterForm({
             <FormItem>
               <FormLabel>Password repeat</FormLabel>
               <FormControl>
-                <Input {...field} type="password" disabled={form.formState.isSubmitting}/>
+                <Input
+                  {...field}
+                  type="password"
+                  disabled={form.formState.isSubmitting}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

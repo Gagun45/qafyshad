@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { dbConnect } from "./dbconnect";
 import { User } from "./models";
 import { Types } from "mongoose";
+import { hashPassword, verifyPassword } from "./hashPassword";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -14,8 +15,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           await dbConnect();
           const user = await User.findOne({
             email: credentials.email,
-            password: credentials.password,
           });
+
+          if (!verifyPassword(credentials.password as string, user.password)) {
+            return null;
+          }
 
           return {
             email: user.email,
@@ -54,6 +58,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           isAdmin: dbUser.isAdmin,
           name: dbUser.name,
           contact: dbUser.contact,
+          serverField: dbUser.email + dbUser.name,
         },
       };
       return filteredSession;
@@ -63,7 +68,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         await dbConnect();
         let existingUser = await User.findOne({ email: user.email });
         if (!existingUser) {
-          const password = crypto.randomUUID().slice(0, 8).toUpperCase();
+          const password = hashPassword(
+            crypto.randomUUID().slice(0, 8).toUpperCase()
+          );
           existingUser = await User.create({
             email: user.email,
             password,

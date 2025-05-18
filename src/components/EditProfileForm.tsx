@@ -19,6 +19,8 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { useEffect, type Dispatch, type SetStateAction } from "react";
 import { Redo2Icon } from "lucide-react";
+import { editProfile } from "@/lib/actions/editProfile";
+import { EditProfileMessages, SMTH_WENT_WRONG } from "@/lib/errors";
 
 const formSchema = z.object({
   name: z
@@ -37,25 +39,23 @@ export function EditProfileForm({
 
   const onResetSubmit = async (data: { name: string; contact: string }) => {
     try {
-      const res = await fetch("/api/profile/editProfile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const response = await res.json();
-      if (!res.ok) {
-        form.setError("root", { message: response.message });
-        toast.error("Something went wrong");
-      } else {
-        toast.success(response.message);
-      }
-    } catch (e) {
-      toast.error("Something went wrong");
-      if (e instanceof Error) {
-        form.setError("root", { message: e.message });
-      }
-    } finally {
+      const result = await editProfile(
+        data.name,
+        data.contact,
+        session?.user.id
+      );
       await update();
+      if (!result.success) {
+        toast.error(SMTH_WENT_WRONG);
+        form.setError("root", { message: result.message });
+        form.reset();
+        return;
+      }
+      toast.success(EditProfileMessages.SUCCESS_EDIT_PROFILE);
+    } catch {
+      toast.error(SMTH_WENT_WRONG);
+      form.setError("root", { message: SMTH_WENT_WRONG });
+    } finally {
       setIsDirty(false);
     }
   };
